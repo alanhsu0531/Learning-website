@@ -2,22 +2,132 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>我的學習網站</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的學習網站總目錄</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; padding: 2em; }
-        h1 { color: #333; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 10px 0; }
-        a { text-decoration: none; color: #007bff; font-size: 1.2em; }
-        a:hover { text-decoration: underline; }
+        /* --- 全局樣式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f4f7f9; /* 柔和的淺灰色背景 */
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* --- 主容器樣式 --- */
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            padding: 2rem 3rem;
+            border-radius: 12px; /* 圓角 */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* 立體感陰影 */
+            text-align: center;
+        }
+
+        /* --- 標題與描述 --- */
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .description {
+            color: #7f8c8d;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- 兩大區塊的容器 --- */
+        .sections-wrapper {
+            display: flex;
+            gap: 2rem; /* 區塊間的距離 */
+            text-align: left;
+        }
+
+        /* --- 單一區塊的樣式 --- */
+        .link-section {
+            flex: 1; /* 讓兩個區塊等寬 */
+        }
+
+        .link-section h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+            border-bottom: 2px solid #3498db; /* 標題底線 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- 連結列表 --- */
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* --- 連結卡片樣式 --- */
+        .link-list li a {
+            display: block;
+            background-color: #ecf0f1;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-left: 5px solid #3498db; /* 左側的裝飾條 */
+            transition: all 0.3s ease; /* 平滑的過渡效果 */
+        }
+
+        /* 滑鼠懸停時的互動效果 */
+        .link-list li a:hover {
+            background-color: #e0e6e8;
+            transform: translateY(-3px) scale(1.02); /* 向上浮動並微放大 */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left-color: #e74c3c; /* 改變裝飾條顏色 */
+        }
+
+        /* --- 響應式設計：在小螢幕上變為單欄 --- */
+        @media (max-width: 768px) {
+            .sections-wrapper {
+                flex-direction: column;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>我的學習網站總目錄</h1>
-    <p>這裡集合了我所有練習與筆記的專案頁面。</p>
-    <ul>
-        <li><a href="./Gene-Expression-Analysis/">基因表現量分析流程</a></li>
-        <li><a href="./Nonsingular-Matrix/">矩陣可逆的充分必要條件</a></li>
-    </ul>
+
+    <div class="container">
+        <h1>我的學習網站總目錄</h1>
+        <p class="description">這裡集合了我所有練習與筆記的專案頁面。</p>
+
+        <div class="sections-wrapper">
+            <div class="link-section">
+                <h2>🧪 方法學 (Methodological)</h2>
+                <ul class="link-list">
+                    <li><a href="./matrix-inverse-conditions/">矩陣可逆的充分必要條件</a></li>
+                    </ul>
+            </div>
+
+            <div class="link-section">
+                <h2>🧬 應用 (Application)</h2>
+                <ul class="link-list">
+                    <li><a href="./gene-expression-analysis/">基因表現分析流程</a></li>                    
+                    </ul>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
