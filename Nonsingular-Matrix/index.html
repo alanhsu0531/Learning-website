@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式探索：矩陣 AᵀA 的可逆性</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Calm Harmony (Stone/Slate neutrals with a muted Blue accent) -->
+    <!-- Application Structure Plan: A single-page, vertical-scroll application designed for guided exploration. It starts with the main theorem, then presents an interactive proof flowchart, followed by collapsible deep-dive sections for key concepts. Two interactive modules visualize the n>=m dimensional constraint and the application in least squares. This structure prioritizes learning and discovery over the linear, formal structure of the source report, making abstract concepts more tangible. -->
+    <!-- Visualization & Content Choices: 1. Main Theorem: Presented as a visual flowchart (HTML/CSS divs) to organize the logical steps of the proof interactively. 2. Dimensional Constraint (n>=m): An interactive visualizer with sliders (HTML/JS) to inform the user about this critical prerequisite. 3. Least Squares Application: A scatter plot (Chart.js/Canvas) to relate the abstract theorem to a practical data fitting problem. 4. Core Concepts: Presented in collapsible accordions (HTML/JS) to provide optional detail without cluttering the main flow. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .math {
+            font-family: 'Times New Roman', Times, serif;
+            display: inline-block;
+        }
+        .matrix-sup {
+            font-size: 0.7em;
+            vertical-align: super;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .matrix-grid {
+            display: grid;
+            gap: 4px;
+            padding: 8px;
+            background-color: #f1f5f9; /* slate-100 */
+            border-radius: 4px;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: all 0.3s ease;
+        }
+        .matrix-cell {
+            width: 20px;
+            height: 20px;
+            background-color: #93c5fd; /* blue-300 */
+            border-radius: 2px;
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #9ca3af; /* gray-400 */
+            line-height: 1;
+        }
+        .accent-text {
+            color: #3b82f6; /* blue-500 */
+        }
+        .accent-bg {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .accent-border {
+            border-color: #3b82f6; /* blue-500 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-5xl px-4 py-8 md:py-12">
+
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">互動式探索：矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性</h1>
+            <p class="text-lg text-slate-600">一個關於線性代數中重要定理的直觀指南</p>
+        </header>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-6">核心問題與答案</h2>
+            <div class="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-6 rounded-lg text-center">
+                <p class="text-lg mb-2">給定一個 <span class="math">n &times; m</span> 的矩陣 <span class="math">A</span>，其衍生的 <span class="math">m &times; m</span> 方陣 <span class="math">B = A<span class="matrix-sup">T</span>A</span> 何時為可逆矩陣？</p>
+                <p class="text-xl font-semibold">答案：<span class="accent-text">若且唯若</span>，矩陣 <span class="math">A</span> 的所有<span class="accent-text">行向量（columns）線性獨立</span>。</p>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">證明的邏輯鏈</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理的證明基於一系列優雅的等價關係。下面的流程圖展示了整個邏輯推導的關鍵步驟，將 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性與 <span class="math">A</span> 的性質聯繫起來。</p>
+            <div class="flex flex-col items-center space-y-4">
+                <div class="w-full max-w-md p-4 bg-white border-2 accent-border rounded-lg shadow-md text-center">
+                    <h3 class="font-semibold text-lg"><span class="math">A<span class="matrix-sup">T</span>A</span> 可逆</h3>
+                    <p class="text-sm text-slate-500">這是我們的出發點</p>
+                </div>
+                <div class="flow-arrow">&Updownarrow;</div>
+                <div class="w-full max-w-md p-4 bg-white border border-slate-300 rounded-lg shadow text-center">
+                    <h3 class="font-semibold text-lg"><span class="math">N(A<span class="matrix-sup">T</span>A</span>) = {0}</h3>
+                    <p class="text-sm text-slate-500">可逆矩陣的核空間僅包含零向量</p>
+                </div>
+                <div class="flow-arrow">&Updownarrow;</div>
+                <div class="w-full max-w-md p-4 bg-blue-100 border border-blue-300 rounded-lg shadow text-center ring-2 ring-blue-200">
+                    <h3 class="font-semibold text-lg accent-text"><span class="math">N(A) = N(A<span class="matrix-sup">T</span>A)</span></h3>
+                    <p class="text-sm text-slate-500 font-medium">這是最關鍵的橋樑！</p>
+                </div>
+                <div class="flow-arrow">&Updownarrow;</div>
+                <div class="w-full max-w-md p-4 bg-white border border-slate-300 rounded-lg shadow text-center">
+                    <h3 class="font-semibold text-lg"><span class="math">N(A)</span> = {0}</h3>
+                    <p class="text-sm text-slate-500">將條件轉移到了矩陣 <span class="math">A</span> 上</p>
+                </div>
+                <div class="flow-arrow">&Updownarrow;</div>
+                <div class="w-full max-w-md p-4 bg-white border-2 accent-border rounded-lg shadow-md text-center">
+                    <h3 class="font-semibold text-lg">矩陣 <span class="math">A</span> 的行向量線性獨立</h3>
+                    <p class="text-sm text-slate-500">這是最終的充分必要條件</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">關鍵概念解析</h2>
+            <div class="space-y-4 max-w-3xl mx-auto">
+                <div class="accordion-item bg-white border border-slate-200 rounded-lg">
+                    <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
+                        <span>1. 什麼是可逆矩陣？</span>
+                        <span class="transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-4 border-t border-slate-200 text-slate-700">
+                            <p>一個 <span class="math">m &times; m</span> 的方陣 <span class="math">B</span> 可逆，如果存在另一個矩陣 <span class="math">B<span class="matrix-sup">-1</span></span> 使得 <span class="math">BB<span class="matrix-sup">-1</span> = B<span class="matrix-sup">-1</span>B = I</span>。這有多個等價條件：</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>其秩等於其維度 <span class="math">m</span> (滿秩)。</li>
+                                <li>其核空間 <span class="math">N(B)</span> 只包含零向量。</li>
+                                <li>其所有行向量（或列向量）線性獨立。</li>
+                                <li>其行列式不為零 <span class="math">det(B) &ne; 0</span>。</li>
+                                <li>齊次方程組 <span class="math">Bx = 0</span> 只有唯一解 <span class="math">x = 0</span>。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-white border border-slate-200 rounded-lg">
+                    <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
+                        <span>2. 為什麼 <span class="math">N(A) = N(A<span class="matrix-sup">T</span>A)</span>？</span>
+                        <span class="transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-4 border-t border-slate-200 text-slate-700 space-y-4">
+                            <p>這是證明中最巧妙的部分，需要雙向證明：</p>
+                            <div>
+                                <h4 class="font-semibold">證明 <span class="math">N(A) &subseteq; N(A<span class="matrix-sup">T</span>A)</span>:</h4>
+                                <p>若 <span class="math">x</span> 在 <span class="math">N(A)</span> 中，則 <span class="math">Ax = 0</span>。用 <span class="math">A<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">A<span class="matrix-sup">T</span>(Ax) = A<span class="matrix-sup">T</span>0</span>，即 <span class="math">A<span class="matrix-sup">T</span>Ax = 0</span>。所以 <span class="math">x</span> 也在 <span class="math">N(A<span class="matrix-sup">T</span>A)</span> 中。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">證明 <span class="math">N(A<span class="matrix-sup">T</span>A) &subseteq; N(A)</span>:</h4>
+                                <p>若 <span class="math">x</span> 在 <span class="math">N(A<span class="matrix-sup">T</span>A)</span> 中，則 <span class="math">A<span class="matrix-sup">T</span>Ax = 0</span>。用 <span class="math">x<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">x<span class="matrix-sup">T</span>A<span class="matrix-sup">T</span>Ax = 0</span>。這可以寫成 <span class="math">(Ax)<span class="matrix-sup">T</span>(Ax) = 0</span>，也就是向量 <span class="math">Ax</span> 的長度平方 <span class="math">||Ax||<span class="matrix-sup">2</span> = 0</span>。一個向量長度為零，若且唯若該向量本身是零向量。因此 <span class="math">Ax = 0</span>，所以 <span class="math">x</span> 也在 <span class="math">N(A)</span> 中。</p>
+                            </div>
+                            <p class="font-medium">既然兩個集合互為子集，它們必然相等。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">維度約束：一個必要的先決條件</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">為了使矩陣 <span class="math">A</span> 的 <span class="math">m</span> 個行向量線性獨立，<span class="math">A</span> 的維度必須滿足一個基本條件：行數 <span class="math">n</span> 必須大於或等於列數 <span class="math">m</span> (<span class="math">n &ge; m</span>)。請使用下方的滑桿來探索這個概念。</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="flex flex-col items-center">
+                    <div class="w-full max-w-sm">
+                         <div class="mb-4">
+                            <label for="rows_n" class="font-medium">行數 n = <span id="rows_n_value">5</span></label>
+                            <input type="range" id="rows_n" min="1" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
+                        </div>
+                        <div>
+                            <label for="cols_m" class="font-medium">行向量數 m = <span id="cols_m_value">4</span></label>
+                            <input type="range" id="cols_m" min="1" max="10" value="4" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <div id="matrix_ A_vis" class="matrix-grid mb-4"></div>
+                    <div id="dimension_result" class="text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">應用：最小平方法</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理在數據科學中至關重要。當我們想用一條直線擬合一組數據點時（線性迴歸），我們會求解一個線性系統 <span class="math">Ax = b</span>。通常這個系統沒有精確解，我們會尋找一個「最佳擬合」解，這可以通過求解正規方程 <span class="math">A<span class="matrix-sup">T</span>Ax = A<span class="matrix-sup">T</span>b</span> 來找到。如果 <span class="math">A<span class="matrix-sup">T</span>A</span> 可逆，我們就能找到唯一的最佳解 <span class="math">&xcirc; = (A<span class="matrix-sup">T</span>A)<span class="matrix-sup">-1</span>A<span class="matrix-sup">T</span>b</span>。</p>
+            <div class="flex flex-col items-center">
+                <div class="chart-container">
+                    <canvas id="leastSquaresChart"></canvas>
+                </div>
+                <button id="fitLineBtn" class="mt-6 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-transform transform hover:scale-105">
+                    尋找唯一最佳擬合線
+                </button>
+            </div>
+        </section>
+
+        <footer class="text-center mt-12 text-slate-500">
+            <p>&copy; 2024 互動式線性代數探索。保留所有權利。</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Accordion Logic
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = header.querySelector('span:last-child');
+                header.addEventListener('click', () => {
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Dimensional Constraint Visualizer
+            const nSlider = document.getElementById('rows_n');
+            const mSlider = document.getElementById('cols_m');
+            const nValue = document.getElementById('rows_n_value');
+            const mValue = document.getElementById('cols_m_value');
+            const matrixVis = document.getElementById('matrix_ A_vis');
+            const resultDiv = document.getElementById('dimension_result');
+
+            function updateDimensionVisualizer() {
+                const n = parseInt(nSlider.value);
+                const m = parseInt(mSlider.value);
+                nValue.textContent = n;
+                mValue.textContent = m;
+
+                matrixVis.innerHTML = '';
+                matrixVis.style.gridTemplateColumns = `repeat(${m}, 20px)`;
+                
+                for (let i = 0; i < n * m; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('matrix-cell');
+                    matrixVis.appendChild(cell);
+                }
+
+                if (n < m) {
+                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-red-800">行向量線性相依</h4><p class="text-red-700">行數 (n=${n}) 小於行向量數 (m=${m})。<br>在 ${n} 維空間中，${m} 個向量必定線性相依。<br>因此 <span class="font-semibold">A<span class="matrix-sup">T</span>A</span> 必不可逆。</p>`;
+                    resultDiv.className = 'text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300 bg-red-100 border border-red-200';
+                } else {
+                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-green-800">行向量可能線性獨立</h4><p class="text-green-700">行數 (n=${n}) 大於或等於行向量數 (m=${m})。<br>滿足了行向量線性獨立的必要條件。<br>因此 <span class="font-semibold">A<span class="matrix-sup">T</span>A</span> 可能為可逆。</p>`;
+                    resultDiv.className = 'text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300 bg-green-100 border border-green-200';
+                }
+            }
+
+            nSlider.addEventListener('input', updateDimensionVisualizer);
+            mSlider.addEventListener('input', updateDimensionVisualizer);
+            updateDimensionVisualizer();
+
+            // Least Squares Chart
+            const ctx = document.getElementById('leastSquaresChart').getContext('2d');
+            const dataPoints = [
+                {x: 1, y: 1.5}, {x: 2, y: 3.8}, {x: 3, y: 6.5}, {x: 4, y: 8.2},
+                {x: 5, y: 11.3}, {x: 6, y: 13.5}, {x: 7, y: 15.1}, {x: 8, y: 17.9}
+            ];
+            
+            const leastSquaresChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '數據點',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'X'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Y'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `(${context.parsed.x}, ${context.parsed.y})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('fitLineBtn').addEventListener('click', () => {
+                const existingLine = leastSquaresChart.data.datasets.find(ds => ds.type === 'line');
+                if (existingLine) return; // Don't add if already exists
+
+                const lineData = [
+                    {x: 0, y: -0.85},
+                    {x: 9, y: 20.35}
+                ];
+
+                const lineDataset = {
+                    type: 'line',
+                    label: '最佳擬合線',
+                    data: lineData,
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.1
+                };
+
+                leastSquaresChart.data.datasets.push(lineDataset);
+                leastSquaresChart.update();
+            });
+        });
+    </script>
+
+</body>
+</html>

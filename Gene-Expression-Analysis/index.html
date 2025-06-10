@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSE40967 基因表達資料處理互動指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Visualization & Content Choices: 
+        - Report Sections (e.g., Data Acquisition, QC, Normalization, Annotation, Filtering, Batch Correction, Finalization, Best Practices, Appendix) -> Goal: Inform/Guide -> Presentation: HTML text, tables, pre/code blocks for R code, sidebar navigation. Interaction: Click to navigate. Justification: Direct and clear presentation of report content in a navigable format. Method: HTML/Tailwind/JS.
+        - Table 1 (Dataset Summary), Table 2 (Preprocessing Comparison), Table 3 (Annotation Strategies), Table 4 (Bioconductor Packages) -> Goal: Inform/Summarize -> Presentation: HTML tables. Interaction: Static. Justification: Standard and effective for tabular data. Method: HTML/Tailwind.
+        - QC Metrics (Sec 3.2), Post-Normalization QC (Sec 4.2), Batch Effect ID (Sec 7.1) -> Goal: Illustrate concepts (e.g., data distributions, PCA plots) -> Presentation: Conceptual charts (box plots, density plots, scatter plots for PCA). Interaction: Static display, illustrative of data states. Justification: Visual aids to understand abstract QC steps described in text. Library: Chart.js (Canvas).
+        - Overall Workflow Diagram (Conceptual) -> Goal: Provide overview -> Presentation: Simple block diagram using HTML/Tailwind. Interaction: Static. Justification: Helps users grasp the entire process flow. Method: HTML/Tailwind.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        .content-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: #e5e7eb; /* stone-200 */
+            border-radius: 10px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: #9ca3af; /* stone-400 */
+            border-radius: 10px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* stone-500 */
+        }
+        .nav-link.active {
+            background-color: #0ea5e9; /* sky-500 */
+            color: white;
+            font-weight: 600;
+        }
+        .nav-link:hover {
+            background-color: #38bdf8; /* sky-400 */
+            color: white;
+        }
+        h2 {
+            font-size: 1.75rem; /* text-2xl */
+            font-weight: 700;
+            color: #1e3a8a; /* sky-800 */
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #bfdbfe; /* sky-200 */
+        }
+        h3 {
+            font-size: 1.375rem; /* text-xl + halfway to 2xl */
+            font-weight: 600;
+            color: #1d4ed8; /* sky-700 */
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        h4 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #2563eb; /* sky-600 */
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        p, li {
+            line-height: 1.65;
+            color: #374151; /* stone-700 */
+            margin-bottom: 0.75rem;
+        }
+        table {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #d1d5db; /* stone-300 */
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.875rem; /* text-sm */
+        }
+        th {
+            background-color: #f3f4f6; /* stone-100 */
+            font-weight: 600;
+            color: #1f2937; /* stone-800 */
+        }
+        pre {
+            background-color: #1f2937; /* stone-800 */
+            color: #d1d5db; /* stone-300 */
+            padding: 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+        .chart-container-wrapper { /* Added wrapper for consistent styling around chart */
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-30 bg-sky-700 text-white p-2 rounded-md">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="sidebar" class="w-full md:w-80 bg-sky-800 text-sky-100 p-5 space-y-1.5 transform -translate-x-full md:translate-x-0 fixed md:sticky top-0 h-screen md:h-auto overflow-y-auto transition-transform duration-300 ease-in-out z-20 flex-shrink-0 content-scroll">
+            <h1 class="text-2xl font-semibold text-white pb-4 mb-4 border-b border-sky-600">GSE40967 處理流程</h1>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="intro">
+                <i class="fas fa-info-circle mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">前言</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="overview">
+                <i class="fas fa-database mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">1. GSE40967 資料集概覽</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="acquisition">
+                <i class="fas fa-download mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">2. 資料獲取與環境設定</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="qc">
+                <i class="fas fa-vial-circle-check mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">3. 初始資料載入與 QC</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="preprocessing">
+                <i class="fas fa-sliders-h mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">4. 標準化預處理流程</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="annotation">
+                <i class="fas fa-tags mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">5. 基因層級註釋與精煉</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="filtering">
+                <i class="fas fa-filter mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">6. 資料篩選</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="batch_effects">
+                <i class="fas fa-layer-group mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">7. 批次效應處理</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="finalizing_data">
+                <i class="fas fa-file-invoice mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">8. 為不平衡分類最終化資料</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="summary">
+                <i class="fas fa-clipboard-check mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">9. 最佳實踐與總結</span>
+            </a>
+            <a href="#" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md" data-target="appendix">
+                <i class="fas fa-book mr-3 flex-shrink-0 w-5 h-5"></i><span class="truncate">附錄: 核心套件</span>
+            </a>
+        </nav>
+
+        <main class="flex-1 p-6 md:p-10 bg-stone-50 content-scroll">
+            <div id="intro" class="content-section">
+                <h2>前言</h2>
+                <p>本應用程式旨在將《GSE40967 基因表達資料處理與強化不平衡分類表現之流程詳解》報告的內容，以互動方式呈現。報告詳細闡述處理基因表達量資料集 GSE40967 的完整步驟與流程，特別針對強化不平衡資料下分類表現之研究需求。內容涵蓋資料下載、原始資料品質控制、標準化預處理、基因註釋、資料篩選、批次效應校正，以及最終資料整理，為後續採用如 SMOTE (Synthetic Minority Over-sampling Technique) 等不平衡學習方法及建構分類模型奠定堅實基礎。本流程將主要利用 Bioconductor 套件進行分析，確保分析過程的再現性與嚴謹性。</p>
+                <h3>整體流程概念圖</h3>
+                <div class="bg-white p-4 rounded-md shadow mb-6">
+                    <div class="space-y-2 text-sm text-center">
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">1. 資料獲取 (CEL, Phenodata)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">2. 初始QC (arrayQualityMetrics)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">3. 標準化預處理 (RMA)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">4. 基因註釋 (hgu133plus2.db)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">5. 資料篩選 (genefilter)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-sky-100 border border-sky-300 rounded">6. 批次效應校正 (ComBat)</div>
+                        <div class="text-sky-600"><i class="fas fa-arrow-down"></i></div>
+                        <div class="p-2 bg-green-100 border border-green-300 rounded">7. 最終數據 (for SMOTE & Classification)</div>
+                    </div>
+                </div>
+                <p>請使用左側導覽列探索各個處理步驟的詳細內容。</p>
+            </div>
+
+            <div id="overview" class="content-section hidden">
+                <h2>1. GSE40967 資料集概覽與相關研究</h2>
+                <p>GSE40967 是一個與大腸癌分子亞型分類相關的基因表達研究，其實為一個 SuperSeries，包含了子系列如 GSE39582 [1, 2]。GSE39582 資料集包含 585 個來自大腸癌患者的樣本，利用 Affymetrix Human Genome U133 Plus 2.0 Array (平台 GPL570) 進行 mRNA 表達譜分析 [3]。該研究旨在建立一個穩定的大腸癌分子分型系統，並已成功識別出六種具有不同臨床、分子及存活特徵的分子亞型 [3]。這些亞型的發現對於改進預後模型和發展標靶治療具有重要意義 [3]。</p>
+                <p>GSE40967 資料集本身也被其他研究用於不同目的，例如 Chan 等人利用此資料集 (特別是其中 196 位 I 期或 II 期未接受輔助化療的患者數據) 作為訓練集，開發預測大腸癌復發的基因模型 [4]。該研究特別關注了資料不平衡問題，因為復發事件在早期患者中相對罕見 (17.3%)，並採用了 SMOTE 技術來處理此問題 [4]。</p>
+                <h4>表 1: GSE40967 (GSE39582) 資料集摘要</h4>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>特性</th><th>描述</th><th>參考資料</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>GEO 登錄號</td><td>GSE40967 (SuperSeries), GSE39582 (SubSeries)</td><td>[1, 3]</td></tr>
+                            <tr><td>研究主題</td><td>大腸癌的基因表達分類，定義六種分子亞型</td><td>[1, 3]</td></tr>
+                            <tr><td>物種</td><td><em>Homo sapiens</em> (人類)</td><td></td></tr>
+                            <tr><td>實驗類型</td><td>基因表達譜分析 (Expression profiling by array)</td><td></td></tr>
+                            <tr><td>平台</td><td>Affymetrix Human Genome U133 Plus 2.0 Array (GPL570)</td><td>[3, 4]</td></tr>
+                            <tr><td>GSE39582 樣本數</td><td>585 個樣本 (443 個發現集, 123 個驗證集, 19 個非腫瘤黏膜)</td><td>[3]</td></tr>
+                            <tr><td>原始資料格式</td><td>CEL 檔案 (可從 GSE39582_RAW.tar 下載)</td><td>[3, 5]</td></tr>
+                            <tr><td>相關出版物</td><td>Marisa et al. (2013) <em>PLoS Med</em>; Chan et al. (2021) <em>Front. Oncol.</em></td><td>[3, 4]</td></tr>
+                            <tr><td>資料不平衡特性</td><td>在 Chan 等人的研究中，復發事件為少數類別 (17.3%)</td><td>[4]</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>對於旨在處理基因表達資料不平衡以強化分類表現的研究而言，GSE40967 (特別是其子系列 GSE39582 的原始數據) 提供了一個包含大量樣本且具有明確臨床意義與已發表不平衡處理先例的理想資料來源。獲取並正確處理其原始 CEL 檔案是後續分析成功的關鍵第一步。</p>
+            </div>
+
+            <div id="acquisition" class="content-section hidden">
+                <h2>2. 資料獲取與環境設定</h2>
+                <p>為確保分析的再現性與準確性，從原始資料入手至關重要。本節將詳述如何獲取 GSE39582 (GSE40967 的主要表達譜數據來源) 的原始 CEL 檔案及相關的表型數據 (phenotypic data)，並建議如何組織這些資料以利後續分析。</p>
+                <h3>2.1. 原始資料 (CEL 檔案) 下載</h3>
+                <p>GSE39582 的原始微陣列數據以 CEL 檔案形式存儲，這些檔案包含了探針級別的原始強度資訊，是進行標準化預處理的起點。根據 NCBI GEO 的說明，原始數據檔案通常作為補充檔案提供 [1, 5]。對於 GSE39582，其原始 CEL 檔案被打包在名為 <code>GSE39582_RAW.tar</code> 的壓縮檔中 [3]。</p>
+                <p>可利用 Bioconductor 中的 <code>GEOquery</code> 套件來下載這些補充檔案。<code>GEOquery</code> 套件提供了一系列函數，用於從 NCBI GEO 資料庫中獲取數據 [6, 7]。<code>getGEOSuppFiles()</code> 函數特別適用於下載補充檔案。</p>
+                <h4>R 程式碼範例 (概念性):</h4>
+                <pre><code># if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install("GEOquery")
+# library(GEOquery)
+
+# 設定下載路徑
+# download_directory <- "path/to/download_directory"
+# CEL_files_directory <- "path/to/CEL_files_directory"
+# dir.create(download_directory, recursive = TRUE, showWarnings = FALSE)
+# dir.create(CEL_files_directory, recursive = TRUE, showWarnings = FALSE)
+
+# 下載 GSE39582 的補充檔案 (包含 GSE39582_RAW.tar)
+# getGEOSuppFiles("GSE39582", baseDir = download_directory)
+
+# 解壓縮 TAR 檔案以獲取 CEL 檔案
+# untar(file.path(download_directory, "GSE39582", "GSE39582_RAW.tar"), exdir = CEL_files_directory)
+
+# 列出解壓縮後的 CEL 檔案 (通常為.CEL.gz 格式)
+# list.files(CEL_files_directory, pattern = "\\.CEL\\.gz$", full.names = TRUE)</code></pre>
+                <p>雖然 <code>GEOquery</code> 的 <code>getGEO()</code> 函數也能下載 Series Matrix 檔案 (通常包含已處理數據)，但對於本研究目標而言，利用 <code>getGEOSuppFiles()</code> 獲取原始 <code>_RAW.tar</code> 檔案更為合適，因為這能確保研究者對預處理流程擁有完全的控制權。Series Matrix 檔案中的數據可能已經過某些程度的處理，這可能不符合特定研究的需求，特別是當目標是探索不同的預處理策略以優化不平衡分類時。</p>
+                <h3>2.2. 提取表型數據 (樣本資訊)</h3>
+                <p>表型數據，或稱樣本資訊 (sample information/metadata)，對於後續的分類任務至關重要，因為它包含了定義樣本類別 (如分子亞型、復發狀態等) 的變數。GSE39582 的 Series Matrix File (TXT 格式) 或 SOFT 格式家族檔案中儲存了豐富的樣本元數據 [3]。</p>
+                <p>同樣可以使用 <code>GEOquery::getGEO()</code> 函數來解析 Series Matrix 檔案，主要目的是提取其 <code>ExpressionSet</code> 物件中的 <code>phenoData</code> 插槽 (slot)，該插槽儲存了表型資訊。</p>
+                <h4>R 程式碼範例 (概念性):</h4>
+                <pre><code># gse39582_metadata_list <- getGEO("GSE39582", GSEMatrix = TRUE, AnnotGPL = FALSE)
+# pheno_data_df <- NULL
+# if (length(gse39582_metadata_list) > 0) {
+#   # 通常 getGEO 返回一個列表，每個元素是一個 ExpressionSet
+#   # 在此假設只有一個主要 ExpressionSet，對於 GSE39582 這通常是成立的
+#   gse39582_eset <- gse39582_metadata_list[[1]] # 取列表中的第一個 ExpressionSet
+#   pheno_data_df <- pData(gse39582_eset)
+#   # 檢查 pheno_data_df 的欄位名稱，例如:
+#   # print(names(pheno_data_df))
+#   # 尋找與 "six molecular subtypes" [1, 3] 或復發狀態 [4] 相關的欄位
+#   # 例如，Marisa et al. (2013) 的研究中，分子亞型資訊可能在 'characteristics_ch1.1' 或類似欄位
+#   # 需要仔細檢查GEO頁面上的樣本描述或原始出版物以確定確切欄位
+# } else {
+#   print("未能從GEO獲取GSE39582的Series Matrix資訊。")
+# }</code></pre>
+                <p>在處理從 GEO 下載的表型數據時，一個常見的挑戰是其格式可能不一致。如果某些樣本缺少某些特徵 (characteristics)，可能導致數據欄位發生位移 [8]。因此，在提取 <code>phenoData</code> 後，必須仔細檢查並可能需要進行清理，以確保每個樣本的資訊都正確對應。關鍵欄位包括樣本ID (用於與 CEL 檔案匹配)、臨床資訊，以及本研究可能感興趣的目標變數，如 Marisa 等人研究中定義的「六種分子亞型」[3]，或 Chan 等人研究中使用的復發資訊 [4]。表型數據的品質和完整性直接影響分類模型的訓練和評估，因此 meticulous 地檢查和整理 <code>pData</code> 是確保樣本到表型準確映射的關鍵步驟，其重要性不容忽視。</p>
+                <h3>2.3. 資料組織</h3>
+                <p>建立一個清晰的項目目錄結構對於管理分析流程至關重要。建議如下：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>主項目目錄</strong>: 例如 <code>GSE40967_Imbalanced_Classification/</code>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><code>data/</code>: 存放所有原始及處理後的數據。
+                                <ul class="list-disc list-inside ml-6">
+                                    <li><code>data/raw_CEL_files/</code>: 存放從 <code>GSE39582_RAW.tar</code> 解壓縮出來的所有 <code>.CEL.gz</code> 檔案。</li>
+                                    <li><code>data/metadata/</code>: 存放表型數據檔案 (例如，清理後的 <code>pheno_data_df</code> 可存為 CSV 檔案)。</li>
+                                </ul>
+                            </li>
+                            <li><code>scripts/</code>: 存放所有 R 分析腳本。</li>
+                            <li><code>results/</code>: 存放分析過程中產生的結果，如 QC 報告、圖表、模型等。
+                                <ul class="list-disc list-inside ml-6">
+                                    <li><code>results/QC/</code></li>
+                                    <li><code>results/normalized_data/</code></li>
+                                    <li><code>results/final_data_for_classification/</code></li>
+                                </ul>
+                            </li>
+                            <li><code>README.md</code>: 描述項目、數據來源、分析步驟和環境設定。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>確保 CEL 檔案的名稱能夠輕易地與表型數據中的樣本ID對應起來。通常，CEL 檔案的名稱本身就包含了樣本的 GEO 登錄號 (GSM ID)，可以作為匹配的依據。</p>
+            </div>
+            
+            <div id="qc" class="content-section hidden">
+                <h2>3. 初始資料載入與綜合品質控制 (QC)</h2>
+                <p>在獲得原始 CEL 檔案和表型數據後，下一步是將這些數據載入 R 環境中，並進行全面的品質控制 (Quality Control, QC)。QC 是微陣列數據分析中不可或缺的環節，旨在識別並處理有問題的陣列，確保後續分析的可靠性。</p>
+                <h3>3.1. 讀取 Affymetrix CEL 檔案</h3>
+                <p>Bioconductor 提供了多個套件用於讀取 Affymetrix CEL 檔案。常用的有 <code>affy</code> 套件的 <code>ReadAffy()</code> 函數 [9] 和 <code>oligo</code> 套件的 <code>read.celfiles()</code> 函數。<code>oligo</code> 套件通常被推薦用於較新的 Affymetrix 陣列，並提供更現代化的註釋功能，但 <code>affy</code> 套件也非常成熟且廣泛使用。Chan 等人的研究中使用了 <code>affy</code> 套件 [4]。</p>
+                <h4>R 程式碼範例 (概念性):</h4>
+                <pre><code># 使用 affy 套件
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install("affy")
+# library(affy)
+
+# cel_file_path <- "path/to/CEL_files_directory/"
+# # 假設 CEL 檔案未經.gz 壓縮，若有則 pattern = "\\.CEL\\.gz$"
+# cel_files_shortnames <- list.files(cel_file_path, pattern = "\\.CEL$", full.names = FALSE) 
+# # 在實際操作中，若檔案是 .CEL.gz，則 pattern = "\\.CEL\\.gz$"
+# cel_files_fullnames <- list.files(cel_file_path, pattern = "\\.CEL$", full.names = TRUE)
+
+# # 創建一個 AnnotatedDataFrame 來儲存表型數據
+# # 假設 pheno_data_df 的行名是 GSM IDs，且與 CEL 檔案的 GSM ID 部分對應
+# # 需要確保 pheno_data_df 的行順序與 cel_files_fullnames 的順序一致
+# # 這通常需要根據 CEL 檔案名提取 GSM ID 並與 pheno_data_df 的行名匹配排序
+# # 範例：假設 cel_files_shortnames 是 "GSMXXXXXX.CEL", "GSMYYYYYY.CEL",...
+# sample_names_from_files <- sub("\\.CEL$", "", cel_files_shortnames) # 提取 GSM ID
+# # 確保 pheno_data_df 的行名與 sample_names_from_files 順序一致
+# pheno_data_df_ordered <- pheno_data_df[match(sample_names_from_files, rownames(pheno_data_df)), ]
+#
+# # 檢查是否有NA，這表示某些CEL檔案的樣本資訊不在pheno_data_df中，或反之
+# if(any(is.na(rownames(pheno_data_df_ordered)))){
+#   stop("Phenodata 和 CEL 檔案之間的樣本名稱不完全匹配或順序不一致。")
+# }
+#
+# adf <- new("AnnotatedDataFrame", data = pheno_data_df_ordered)
+# affy_batch <- ReadAffy(filenames = cel_files_fullnames, phenoData = adf)
+
+# 或者使用 oligo 套件
+# BiocManager::install("oligo")
+# library(oligo)
+# raw_data_oligo <- read.celfiles(filenames = cel_files_fullnames, phenoData = adf)</code></pre>
+                <p>執行後，會產生一個 <code>AffyBatch</code> 物件 (來自 <code>affy</code>) 或一個 <code>ExpressionFeatureSet</code> 物件 (來自 <code>oligo</code>)，其中包含了探針級別的強度數據以及關聯的表型資訊。</p>
+                <h3>3.2. 原始數據的必要 QC 指標與視覺化</h3>
+                <p>利用 <code>affy</code> 或 <code>oligo</code> 套件提供的繪圖功能，對原始探針數據進行 QC：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>強度分佈圖:</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><strong>箱型圖 (Boxplots):</strong> 繪製每個陣列原始 (通常已取 log2) 強度的箱型圖。例如，<code>boxplot(affy_batch, col="lightblue", las=2)</code> [9]。此圖可檢查各陣列間強度分佈的整體一致性。</li>
+                            <li><strong>直方圖或密度圖 (Histograms/Density plots):</strong> 繪製每個陣列原始 (通常已取 log2) 強度的直方圖或密度估計圖。例如，<code>hist(affy_batch, col="lightblue", las=2, main="Raw Log2 Intensities")</code> [9]。</li>
+                        </ul>
+                    </li>
+                    <li><strong>空間偽影檢測 (Spatial Artifact Detection):</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><strong>偽影像圖 (Pseudo-images):</strong> 顯示每個陣列的空間強度分佈。例如，<code>image(affy_batch[,1])</code> 可顯示第一個陣列的偽影像 [9]。此圖有助於檢測晶片表面的物理缺陷。</li>
+                        </ul>
+                    </li>
+                    <li><strong>陣列間關係評估:</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><strong>主成分分析 (Principal Component Analysis, PCA):</strong> 對原始 (log2轉換後) 強度數據進行 PCA。可根據已知的表型變數對樣本點進行著色。</li>
+                            <li><strong>陣列間相關性熱圖 (Inter-array correlation heatmaps):</strong> 計算所有陣列間表達譜的相關性係數。</li>
+                        </ul>
+                    </li>
+                    <li><strong>RNA 降解評估:</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><code>affy</code> 套件提供了 <code>AffyRNAdeg()</code> 函數及相應的 <code>plotAffyRNAdeg()</code> 繪圖函數 [9]。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: 原始數據 Log2 強度箱型圖</h4>
+                        <canvas id="qcBoxplotChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意原始數據中各陣列強度分佈，用於檢查一致性。</p>
+                    </div>
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: 原始數據 Log2 強度密度圖</h4>
+                        <canvas id="qcDensityChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意原始數據中各陣列強度分佈形狀。</p>
+                    </div>
+                     <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: 原始數據 PCA 圖</h4>
+                        <canvas id="qcPcaChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                         <p class="text-xs text-center mt-2">此圖示意PCA分析結果，用於識別離群樣本或批次效應。</p>
+                    </div>
+                </div>
+                <h3>3.3. 利用 <code>arrayQualityMetrics</code> 進行自動化 QC 報告</h3>
+                <p><code>arrayQualityMetrics</code> 是 Bioconductor 中的一個強大套件，能夠自動生成包含多種 QC 圖表和離群點檢測結果的綜合性 HTML 報告 [10, 12, 13, 14]。</p>
+                <h4>R 程式碼範例 (概念性):</h4>
+                <pre><code># BiocManager::install("arrayQualityMetrics")
+# library(arrayQualityMetrics)
+
+# 假設 affy_batch 是 ReadAffy() 產生的 AffyBatch 物件
+# eset_for_aqm <- NULL
+# if (exists("affy_batch")) {
+#   eset_for_aqm <- affy_batch 
+# } else if (exists("raw_data_oligo")) {
+#   # 為了演示，假設我們有一個 ExpressionSet 物件 'eset_raw'
+#   # eset_for_aqm <- eset_raw 
+# }
+
+# if (!is.null(eset_for_aqm)) {
+#   # intgroup_column <- "source_name_ch1" # 根據實際 phenoData 欄位修改
+#   # if (!intgroup_column %in% varLabels(eset_for_aqm)) {
+#   #   warning(paste("指定的 intgroup 欄位 '", intgroup_column, "' 不在 phenoData 中。", sep=""))
+#   #   arrayQualityMetrics(expressionset = eset_for_aqm,
+#   #                       outdir = "results/QC/GSE39582_Raw_QC_Report",
+#   #                       force = TRUE,
+#   #                       do.logtransform = TRUE)
+#   # } else {
+#   #   arrayQualityMetrics(expressionset = eset_for_aqm,
+#   #                       outdir = "results/QC/GSE39582_Raw_QC_Report",
+#   #                       force = TRUE,
+#   #                       do.logtransform = TRUE,
+#   #                       intgroup = intgroup_column)
+#   # }
+# } else {
+#   print("未找到合適的物件進行 arrayQualityMetrics 分析。")
+# }</code></pre>
+                <p><code>arrayQualityMetrics</code> 提供了一個客觀且多面向的數據品質視角，使其更容易識別可能需要在進一步處理前排除的離群陣列 [12]。</p>
+                <h3>3.4. 決策點：陣列排除</h3>
+                <p>根據上述 QC 結果，需要判斷是否有任何陣列品質過差，應從後續分析中移除。這個決策過程和被移除的陣列應詳細記錄下來。</p>
+            </div>
+
+            <div id="preprocessing" class="content-section hidden">
+                <h2>4. 標準化微陣列預處理流程 (正規化與摘要)</h2>
+                <p>完成初步的品質控制並排除任何品質不佳的陣列後，下一步是對原始探針級數據進行標準化的預處理。此流程主要包括背景校正 (background correction)、正規化 (normalization) 和摘要 (summarization) 三個步驟 [10, 15, 16]。</p>
+                <h3>4.1. 選擇預處理方法</h3>
+                <p>對於 Affymetrix 陣列數據，有多種成熟的預處理方法可供選擇：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>RMA (Robust Multi-array Average):</strong> 廣泛使用且表現穩健的方法。流程包括背景校正、分位數正規化和中位數拋光摘要 [9, 16]。Chan 等人研究中使用了 RMA [4]。
+                        <h4>R 程式碼範例 (使用 <code>affy</code> 套件):</h4>
+                        <pre><code># 假設 affy_batch_qc 是經過 QC篩選後的 AffyBatch 物件
+# if (exists("affy_batch_qc")) {
+#   eset_rma <- rma(affy_batch_qc)
+# } else {
+#   print("affy_batch_qc 物件不存在，無法執行 RMA。")
+# }</code></pre>
+                        <h4>R 程式碼範例 (使用 <code>oligo</code> 套件):</h4>
+                        <pre><code># 假設 raw_data_oligo_qc 是經過 QC篩選後的 oligo 原始數據物件
+# if (exists("raw_data_oligo_qc")) {
+#   eset_rma_oligo <- rma(raw_data_oligo_qc)
+# } else {
+#   print("raw_data_oligo_qc 物件不存在，無法執行 RMA。")
+# }</code></pre>
+                    </li>
+                    <li><strong>GCRMA (GC Robust Multi-array Average):</strong> 與 RMA 類似，但在背景校正中額外考慮 GC 含量信息 [15, 17]。
+                        <h4>R 程式碼範例 (使用 <code>gcrma</code> 套件):</h4>
+                        <pre><code># BiocManager::install("gcrma")
+# library(gcrma)
+# if (exists("affy_batch_qc")) {
+#   eset_gcrma <- gcrma(affy_batch_qc)
+# } else {
+#   print("affy_batch_qc 物件不存在，無法執行 GCRMA。")
+# }</code></pre>
+                    </li>
+                    <li><strong>MAS5.0 (Microarray Suite 5.0):</strong> Affymetrix 早期開發的方法，通常變異性較高 [9, 15]。</li>
+                </ul>
+                <p>RMA 是 Affymetrix 數據的常用預設方法。標準 RMA 已包含分位數正規化。</p>
+                <h3>4.2. 預處理輸出與正規化後 QC</h3>
+                <p>預處理輸出為 <code>ExpressionSet</code> 物件，其 <code>exprs</code> 插槽包含正規化後的 log2 表達值矩陣。完成正規化後，應重複部分 QC 步驟：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>箱型圖和密度圖:</strong> 對正規化後的表達數據 (<code>exprs(eset_rma)</code>) 繪製。各陣列強度分佈應更一致。</li>
+                    <li><strong>PCA 圖:</strong> 對正規化數據重新繪製。技術性變異應減少。</li>
+                </ul>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: 正規化後 Log2 強度箱型圖</h4>
+                        <canvas id="normBoxplotChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意正規化後各陣列強度分佈，應較原始數據更為一致。</p>
+                    </div>
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: 正規化後 Log2 強度密度圖</h4>
+                        <canvas id="normDensityChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意正規化後各陣列強度分佈形狀，應較原始數據更為一致。</p>
+                    </div>
+                </div>
+                <h4>表 2: Affymetrix 常用預處理流程比較</h4>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>特性</th><th>RMA</th><th>GCRMA</th><th>MAS5.0</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>背景校正</td><td>卷積模型 (PM only)</td><td>基於探針親和力與 GC 含量模型 (PM & MM)</td><td>基於 MM 探針的理想錯配校正</td></tr>
+                            <tr><td>正規化</td><td>分位數正規化</td><td>分位數正規化</td><td>全局縮放</td></tr>
+                            <tr><td>摘要</td><td>中位數拋光法</td><td>中位數拋光法</td><td>Tukey's Biweight Estimator</td></tr>
+                            <tr><td>基本原理</td><td>多晶片模型</td><td>類似 RMA，但更精確估計背景</td><td>單晶片模型</td></tr>
+                            <tr><td>優點</td><td>精度高，偏差小</td><td>背景校正更準確</td><td>產生P/M/A檢測P值</td></tr>
+                            <tr><td>缺點/考量</td><td>未考慮序列特性</td><td>計算密集度較高</td><td>變異較大</td></tr>
+                            <tr><td>典型套件</td><td><code>affy</code>, <code>oligo</code></td><td><code>gcrma</code></td><td><code>affy</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="annotation" class="content-section hidden">
+                <h2>5. 基因層級註釋與資料精煉</h2>
+                <p>經過 RMA 處理後，<code>ExpressionSet</code> 物件中表達矩陣的行通常對應 Affymetrix 探針組 ID。需要將這些 ID 映射到基因標識符，如基因符號、Entrez Gene ID 等。</p>
+                <h3>5.1. 探針組 ID 到基因資訊的映射</h3>
+                <p>對於 Affymetrix Human Genome U133 Plus 2.0 Array (GPL570)，對應的註釋套件是 <code>hgu133plus2.db</code> [4, 18, 19]。使用 <code>AnnotationDbi::select()</code> 函數查詢。</p>
+                <h4>R 程式碼範例 (概念性):</h4>
+                <pre><code># BiocManager::install("hgu133plus2.db")
+# BiocManager::install("AnnotationDbi")
+# library(hgu133plus2.db)
+# library(AnnotationDbi)
+
+# 假設 eset_rma 是 RMA 處理後的 ExpressionSet 物件
+# probesets <- rownames(exprs(eset_rma))
+# columns_to_retrieve <- c("SYMBOL", "ENTREZID", "GENENAME", "ENSEMBL")
+
+# annotation_data <- AnnotationDbi::select(hgu133plus2.db,
+#                                          keys = probesets,
+#                                          columns = columns_to_retrieve,
+#                                          keytype = "PROBEID")
+# head(annotation_data)</code></pre>
+                <h3>5.2. 處理多重映射與模糊映射的策略</h3>
+                <p>常見情況及策略 [10]：</p>
+                <ol class="list-decimal list-inside ml-4">
+                    <li><strong>移除無法映射到基因符號/Entrez ID 的探針組。</strong></li>
+                    <li><strong>處理映射到同一基因的多個探針組：</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li>選擇單一探針組 (如 IQR 最高)。<code>genefilter::findLargest</code> [20]。</li>
+                            <li>平均信號。</li>
+                        </ul>
+                    </li>
+                    <li><strong>移除映射到多個不同基因的探針組。</strong></li>
+                </ol>
+                <h4>R 程式碼範例 (概念性 - 選擇IQR最大的探針):</h4>
+                <pre><code># library(dplyr)
+# # 假設 annotation_data 已獲取
+# # 篩除非NA的SYMBOL
+# anno_mapped <- subset(annotation_data, !is.na(SYMBOL))
+
+# # 識別唯一映射 (一個 PROBEID 對應一個 SYMBOL)
+# anno_unique_symbol_per_probe <- anno_mapped %>%
+#   group_by(PROBEID) %>%
+#   filter(n_distinct(SYMBOL) == 1) %>%
+#   ungroup()
+
+# # 合併表達數據與註釋
+# exprs_df <- as.data.frame(exprs(eset_rma))
+# exprs_df$PROBEID <- rownames(exprs_df)
+# merged_data <- inner_join(exprs_df, anno_unique_symbol_per_probe, by = "PROBEID")
+
+# # 計算IQR (假設表達數據列從第一列開始，直到PROBEID前一列)
+# numeric_cols_for_iqr <- names(exprs_df)[!names(exprs_df) %in% "PROBEID"]
+# merged_data$IQR <- apply(merged_data[, numeric_cols_for_iqr], 1, IQR, na.rm = TRUE)
+
+# best_probes_per_symbol <- merged_data %>%
+#   group_by(SYMBOL) %>%
+#   filter(IQR == max(IQR, na.rm = TRUE)) %>%
+#   distinct(SYMBOL, .keep_all = TRUE) %>% # 如IQR相同，取第一個
+#   ungroup()
+
+# final_probes_to_keep <- best_probes_per_symbol$PROBEID
+# eset_annotated_filtered <- eset_rma[final_probes_to_keep, ]
+# # 更新 featureData(eset_annotated_filtered)$SYMBOL <- best_probes_per_symbol$SYMBOL (需對應順序)
+</code></pre>
+                <h3>5.3. 更新 <code>ExpressionSet</code></h3>
+                <p>完成註釋和探針選擇後，更新 <code>ExpressionSet</code> 物件的 <code>featureData</code> 插槽。</p>
+                <h4>表 3: 探針註釋與篩選策略</h4>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>問題描述</th><th>策略/方法</th><th>Bioconductor 工具/函數</th><th>理論依據/影響</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>探針無法映射到任何基因</td><td>移除探針</td><td><code>AnnotationDbi::select</code> + <code>subset</code></td><td>無生物學資訊，屬雜訊</td></tr>
+                            <tr><td>探針映射到多個不同基因</td><td>移除探針</td><td><code>dplyr::group_by/summarize/filter</code></td><td>避免信號模糊性</td></tr>
+                            <tr><td>多個探針映射到同一個基因</td><td>1. 選IQR最高或表達最高探針<br>2. 平均信號</td><td>1. <code>genefilter::findLargest</code><br>2. <code>aggregate</code></td><td>1. 減少冗餘<br>2. 綜合資訊</td></tr>
+                            <tr><td>Affymetrix 控制探針 ("AFFX")</td><td>根據名稱模式移除</td><td><code>grep</code>; <code>genefilter::nsFilter</code></td><td>與生物學差異無關</td></tr>
+                            <tr><td>整體表達量過低的基因</td><td>篩除</td><td><code>genefilter::kOverA</code></td><td>測量不可靠，可能引入假陽性</td></tr>
+                            <tr><td>樣本間變異過小的基因</td><td>篩除</td><td><code>genefilter::nsFilter</code>, <code>varFilter</code></td><td>對分類貢獻小</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="filtering" class="content-section hidden">
+                <h2>6. 資料篩選以增強訊號並降低雜訊</h2>
+                <p>進一步的資料篩選對於提高信噪比、降低計算負擔以及改善下游分析或模型性能至關重要 [21, 24]。</p>
+                <h3>6.1. 篩除控制探針</h3>
+                <p>Affymetrix 微陣列晶片上的控制探針組 (ID 通常以 "AFFX" 開頭) 主要用於實驗品質評估，應予以移除。可使用 <code>genefilter::nsFilter</code> 的 <code>feature.exclude="^AFFX"</code> 參數 [21, 23] 或 <code>grep</code> 手動移除。</p>
+                <h3>6.2. 篩除非特異性及低表達/低變異基因</h3>
+                <h4>理論依據：</h4>
+                <p>許多基因表達水平低 (接近背景噪音) 或在樣本間變異小，對區分生物學組別資訊有限。篩除有助於：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>減少雜訊。</li>
+                    <li>降低計算複雜度。</li>
+                    <li>減輕多重假設檢驗負擔。</li>
+                    <li>提高檢測真實生物學信號能力。</li>
+                </ul>
+                <h4>篩選方法：</h4>
+                <ol class="list-decimal list-inside ml-4">
+                    <li><strong>基於表達強度的篩選：</strong>移除在大部分樣本中表達量低於某閾值的基因。例如，若基因中位數表達值未能在至少等於最小實驗組樣本數的樣本中超過某閾值，則篩除 [10]。可使用 <code>genefilter::kOverA</code> [22]。</li>
+                    <li><strong>基於變異的篩選：</strong>移除樣本間表達變異小的基因 (如用 IQR 或方差)。可使用 <code>genefilter::nsFilter</code> (參數 <code>var.func=IQR</code>, <code>var.cutoff=0.5</code>) [21, 23]。</li>
+                </ol>
+                <h4>對不平衡數據的考量：</h4>
+                <p>處理不平衡數據時，篩選需謹慎，避免無意中移除對少數類別具重要區分能力的微弱信號。篩選閾值選擇應結合數據分佈視覺化檢查 [10, 24]。</p>
+            </div>
+
+            <div id="batch_effects" class="content-section hidden">
+                <h2>7. 批次效應的識別與校正 (若存在)</h2>
+                <h3>7.1. 理解與識別批次效應</h3>
+                <p>批次效應 (Batch Effects) 是指由於非生物学因素 (如實驗日期、試劑批次) 引入的系統性技術變異 [25]。對於 GSE39582 這樣的大型樣本集，出現批次效應可能性較高。</p>
+                <h4>識別方法：</h4>
+                <ol class="list-decimal list-inside ml-4">
+                    <li><strong>檢查表型數據 (phenoData)：</strong>尋找潛在批次相關變數。</li>
+                    <li><strong>視覺化探索：</strong>
+                        <ul class="list-disc list-inside ml-6">
+                            <li><strong>主成分分析 (PCA)：</strong>對正規化數據 PCA，並根據潛在批次變數對樣本點著色 [10, 11]。若樣本按技術變數聚集，則暗示批次效應。</li>
+                            <li><strong>層次聚類 (Hierarchical Clustering)。</strong></li>
+                            <li><strong>表達值分佈圖。</strong></li>
+                        </ul>
+                    </li>
+                </ol>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: PCA 顯示潛在批次效應</h4>
+                        <canvas id="batchEffectPcaChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意樣本點可能因不同批次 (顏色) 而聚集。</p>
+                    </div>
+                    <div class="chart-container-wrapper">
+                        <h4 class="text-center mb-2">示意圖: PCA 校正批次效應後</h4>
+                        <canvas id="batchCorrectedPcaChart" class="chart-container w-full max-w-xl mx-auto h-72 md:h-96"></canvas>
+                        <p class="text-xs text-center mt-2">此圖示意批次效應校正後，不同批次樣本混合更均勻。</p>
+                    </div>
+                </div>
+                <h3>7.2. 批次效應校正方法</h3>
+                <p>若檢測到顯著批次效應且與生物學變數混淆，需校正。</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>ComBat (來自 <code>sva</code> 套件)：</strong>經驗貝葉斯方法，可調整已知批次數據，同時保護感興趣的生物學變數 [11, 25]。
+                        <h4>R 程式碼範例 (概念性):</h4>
+                        <pre><code># BiocManager::install("sva")
+# library(sva)
+
+# 假設 eset_filtered 是 ExpressionSet 物件
+# pheno <- pData(eset_filtered)
+# edata <- exprs(eset_filtered)
+
+# # 假設 'batch_variable' 是批次欄位名, 'biological_condition' 是生物學分組欄位名
+# if (!"batch_variable" %in% names(pheno)) {
+#   stop("表型數據中未找到 'batch_variable' 欄位。")
+# }
+# modcombat <- NULL
+# if ("biological_condition" %in% names(pheno)) {
+#    modcombat <- model.matrix(~as.factor(biological_condition), data=pheno)
+# } else {
+#   warning("未找到 'biological_condition' 欄位，ComBat 將不保護任何生物學變數。")
+# }
+#
+# combat_edata <- ComBat(dat=edata,
+#                        batch=as.factor(pheno$batch_variable),
+#                        mod=modcombat,
+#                        par.prior=TRUE,
+#                        prior.plots=FALSE)
+
+# exprs(eset_filtered_batch_corrected) <- combat_edata</code></pre>
+                    </li>
+                    <li><strong><code>limma::removeBatchEffect</code>：</strong>用於移除一個或多個批次因子影響 [26]。</li>
+                </ul>
+                <h4>重要考量：</h4>
+                <p>批次效應校正應謹慎。關鍵是確保生物學變數不與批次變數完全混淆 [11, 25]。若無明確批次資訊但懷疑潛在技術變異，可考慮替代變數分析 (SVA) [11]。</p>
+            </div>
+
+            <div id="finalizing_data" class="content-section hidden">
+                <h2>8. 為不平衡分類分析最終化資料</h2>
+                <p>完成所有預處理步驟後，得到準備好用於下游不平衡分類分析的基因表達數據集。</p>
+                <h3>8.1. 結構化最終處理數據</h3>
+                <p>最終數據應包含：</p>
+                <ol class="list-decimal list-inside ml-4">
+                    <li><strong>基因表達矩陣：</strong>行代表基因，列代表樣本。值為 log2 轉換、正規化、篩選、可能批次校正後的表達量。可從最終 <code>ExpressionSet</code> 的 <code>exprs()</code> 提取。</li>
+                    <li><strong>表型數據框/表格：</strong>與表達矩陣樣本順序對應。包含用於不平衡分類的目標類別標籤 (如分子亞型 [3]、復發狀態 [4] 等)。</li>
+                </ol>
+                <h3>8.2. 不平衡數據處理技術 (如 SMOTE) 的應用考量</h3>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>SMOTE 應用時機：</strong>Chan 等人研究 [4] 在 RMA 正規化後，特徵選擇和模型訓練前，對 GSE40967 子集應用 SMOTE。</li>
+                    <li><strong>數據分割 (Data Splitting) 重要性：</strong>若分割訓練/測試集，SMOTE 等取樣技術<strong>通常僅應用於訓練數據</strong>，以防數據洩漏。</li>
+                    <li><strong>特徵選擇與 SMOTE 順序：</strong>可在 SMOTE 前或後進行，或整合到交叉驗證框架內。Chan 等人研究 [4] 在 SMOTE 和 bagging 後，於子集內部進行特徵選擇。</li>
+                </ul>
+                <p>預處理步驟為後續不平衡學習技術準備了高質量基礎數據。精心清理的數據集品質，對 SMOTE 等方法有效性及最終分類模型性能具決定性影響。</p>
+            </div>
+
+            <div id="summary" class="content-section hidden">
+                <h2>9. 最佳實踐與流程建議總結</h2>
+                <p>本報告詳細闡述處理 GSE40967 (GSE39582) Affymetrix 微陣列基因表達數據的完整流程，旨在為後續針對不平衡數據的強化分類研究提供高質量預處理數據集。</p>
+                <h4>核心流程建議概括：</h4>
+                <ol class="list-decimal list-inside ml-4">
+                    <li><strong>數據獲取：</strong>下載 GSE39582 原始 CEL 檔案及 Series Matrix 檔案。</li>
+                    <li><strong>初始 QC：</strong>使用 <code>affy</code>/<code>oligo</code> 讀取 CEL，結合 <code>arrayQualityMetrics</code> 進行 QC，排除不合格陣列。</li>
+                    <li><strong>正規化與摘要：</strong>推薦 RMA 方法。</li>
+                    <li><strong>基因註釋：</strong>利用 <code>hgu133plus2.db</code> 和 <code>AnnotationDbi</code> 映射探針組 ID。</li>
+                    <li><strong>數據篩選：</strong>移除控制探針及低信息量基因。</li>
+                    <li><strong>批次效應檢查與校正：</strong>利用 PCA 檢查，若顯著則用 <code>ComBat</code> 校正。</li>
+                    <li><strong>最終數據整理：</strong>生成乾淨基因表達矩陣和對應表型數據框。</li>
+                </ol>
+                <h4>強調的最佳實踐：</h4>
+                <ul class="list-disc list-inside ml-4">
+                    <li><strong>從原始數據開始。</strong></li>
+                    <li><strong>多階段 QC。</strong></li>
+                    <li><strong>謹慎的註釋與篩選。</strong></li>
+                    <li><strong>警惕批次效應。</strong></li>
+                    <li><strong>詳細記錄所有分析步驟、參數、軟體版本。</strong></li>
+                </ul>
+                <p>遵循流程和最佳實踐，可獲得高質量基因表達數據集，為後續處理類別不平衡問題、開發穩健分類模型提供堅實基礎。</p>
+            </div>
+            
+            <div id="appendix" class="content-section hidden">
+                <h2>附錄</h2>
+                <h4>表 4: GSE40967 (GSE39582) 分析流程中核心 Bioconductor 套件</h4>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>套件名稱</th><th>核心功能</th><th>主要函數</th><th>安裝指令</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GEOquery</code></td><td>從 NCBI GEO 下載數據</td><td><code>getGEO()</code>, <code>getGEOSuppFiles()</code>, <code>pData()</code></td><td><code>BiocManager::install("GEOquery")</code></td></tr>
+                            <tr><td><code>affy</code></td><td>處理 Affymetrix 數據 (讀取, QC, 正規化)</td><td><code>ReadAffy()</code>, <code>rma()</code>, <code>boxplot()</code>, <code>AffyRNAdeg()</code></td><td><code>BiocManager::install("affy")</code></td></tr>
+                            <tr><td><code>oligo</code></td><td>處理寡核苷酸微陣列數據</td><td><code>read.celfiles()</code>, <code>rma()</code></td><td><code>BiocManager::install("oligo")</code></td></tr>
+                            <tr><td><code>gcrma</code></td><td>GCRMA 正規化</td><td><code>gcrma()</code></td><td><code>BiocManager::install("gcrma")</code></td></tr>
+                            <tr><td><code>arrayQualityMetrics</code></td><td>自動化 QC 報告</td><td><code>arrayQualityMetrics()</code></td><td><code>BiocManager::install("arrayQualityMetrics")</code></td></tr>
+                            <tr><td><code>hgu133plus2.db</code></td><td>HG-U133 Plus 2.0 註釋庫</td><td>(作為數據源)</td><td><code>BiocManager::install("hgu133plus2.db")</code></td></tr>
+                            <tr><td><code>AnnotationDbi</code></td><td>註釋資料庫接口</td><td><code>select()</code>, <code>keys()</code>, <code>columns()</code></td><td><code>BiocManager::install("AnnotationDbi")</code></td></tr>
+                            <tr><td><code>genefilter</code></td><td>基因篩選方法</td><td><code>nsFilter()</code>, <code>varFilter()</code>, <code>kOverA()</code></td><td><code>BiocManager::install("genefilter")</code></td></tr>
+                            <tr><td><code>sva</code></td><td>SVA 與批次效應校正 (ComBat)</td><td><code>ComBat()</code>, <code>sva()</code></td><td><code>BiocManager::install("sva")</code></td></tr>
+                            <tr><td><code>dplyr</code></td><td>數據整理輔助</td><td><code>filter()</code>, <code>group_by()</code>, <code>summarize()</code></td><td><code>install.packages("dplyr")</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>在開始分析前，確保 R 環境中已正確安裝這些套件及其依賴項，將有助於流程的順利執行。</p>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const mainContent = document.querySelector('main');
+
+            function setActiveSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    if (link.dataset.target === targetId) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                 // Scroll to top of content area
+                mainContent.scrollTop = 0;
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.dataset.target;
+                    setActiveSection(targetId);
+                    if (window.innerWidth < 768) { // md breakpoint
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
+
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            
+            // Set initial active section
+            if (navLinks.length > 0) {
+                setActiveSection(navLinks[0].dataset.target);
+            }
+
+            // Helper function to generate random data for charts
+            function getRandomData(count, min, max) {
+                return Array.from({ length: count }, () => Math.random() * (max - min) + min);
+            }
+
+            function createBoxplotData(numArrays, pointsPerArray) {
+                const labels = Array.from({ length: numArrays }, (_, i) => `陣列 ${i + 1}`);
+                const data = labels.map(() => getRandomData(pointsPerArray, 2, 14).sort((a, b) => a - b));
+                // For Chart.js boxplot, we need min, q1, median, q3, max or outliers
+                // This is a simplified representation for illustration.
+                // A real boxplot plugin for Chart.js would be needed for true boxplots.
+                // Here, we'll just show average values as bars for simplicity.
+                 return {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Log2 強度 (示意)',
+                        data: data.map(arr => arr.reduce((a,b)=>a+b,0)/arr.length), // average
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                };
+            }
+            
+            function createDensityData(numArrays, pointsPerLine) {
+                 const labels = Array.from({ length: pointsPerLine }, (_, i) => i);
+                 const datasets = [];
+                 const colors = ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)'];
+                 for (let i = 0; i < Math.min(numArrays, 4); i++) { // Show up to 4 arrays for density
+                    // Generate some bell-curve like data
+                    let mean = Math.random() * 5 + 5; // Random mean between 5-10
+                    let stdDev = Math.random() * 1 + 1; // Random stdDev between 1-2
+                    datasets.push({
+                        label: `陣列 ${i + 1} (示意)`,
+                        data: labels.map(x => {
+                            // Basic normal distribution pdf scaling for visuals
+                            return Math.exp(-0.5 * Math.pow((x - mean*2) / (stdDev*1.5), 2)) * 30; // scale factor for visibility
+                        }),
+                        borderColor: colors[i % colors.length].replace('0.5', '1'),
+                        backgroundColor: colors[i % colors.length],
+                        fill: false,
+                        tension: 0.4
+                    });
+                 }
+                 return { labels, datasets };
+            }
+
+            function createPcaData(numSamples, numGroups) {
+                const data = [];
+                const groupColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)'];
+                for (let i = 0; i < numSamples; i++) {
+                    const group = i % numGroups;
+                    let x = Math.random() * 10 - 5 + (group * 5); // Group separation for batch effect
+                    let y = Math.random() * 10 - 5 + (group * Math.random() * 3);
+                    data.push({ x, y, group });
+                }
+                const datasets = [];
+                for (let g = 0; g < numGroups; g++) {
+                    datasets.push({
+                        label: `組別 ${g + 1} (示意)`,
+                        data: data.filter(p => p.group === g).map(p => ({x: p.x, y: p.y})),
+                        backgroundColor: groupColors[g % groupColors.length],
+                        pointRadius: 5
+                    });
+                }
+                return { datasets };
+            }
+            
+            function createPcaDataCorrected(numSamples) { // Simpler, more mixed
+                const data = [];
+                const groupColors = ['rgba(153, 102, 255, 0.7)']; // Single color for "corrected"
+                for (let i = 0; i < numSamples; i++) {
+                    let x = Math.random() * 15 - 7.5; 
+                    let y = Math.random() * 15 - 7.5;
+                    data.push({ x, y });
+                }
+                return {
+                    datasets: [{
+                        label: '校正後樣本 (示意)',
+                        data: data,
+                        backgroundColor: groupColors[0],
+                        pointRadius: 5
+                    }]
+                };
+            }
+
+            // QC Charts
+            if (document.getElementById('qcBoxplotChart')) {
+                new Chart(document.getElementById('qcBoxplotChart'), {
+                    type: 'bar', data: createBoxplotData(5, 50), options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Log2 強度' } }, x: { title: { display: true, text: '陣列' } } } }
+                });
+            }
+            if (document.getElementById('qcDensityChart')) {
+                new Chart(document.getElementById('qcDensityChart'), {
+                    type: 'line', data: createDensityData(3, 20), options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: { y: { title: { display: true, text: '密度 (示意)'}}, x: { title: { display: true, text: 'Log2 強度 (示意)'}}} }
+                });
+            }
+             if (document.getElementById('qcPcaChart')) {
+                new Chart(document.getElementById('qcPcaChart'), {
+                    type: 'scatter', data: createPcaData(50, 2), options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: {x: { title: { display: true, text: '主成分1 (PC1)'}}, y: { title: { display: true, text: '主成分2 (PC2)'}}}}
+                });
+            }
+
+            // Post-Normalization Charts
+            if (document.getElementById('normBoxplotChart')) {
+                 let normBoxData = createBoxplotData(5, 50);
+                 normBoxData.datasets[0].data = normBoxData.datasets[0].data.map(val => val * 0.8 + 1); // Adjust to look more "normalized"
+                 new Chart(document.getElementById('normBoxplotChart'), {
+                    type: 'bar', data: normBoxData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: '正規化 Log2 強度' } }, x: { title: { display: true, text: '陣列' } } } }
+                });
+            }
+             if (document.getElementById('normDensityChart')) {
+                let normDensityData = createDensityData(3, 20);
+                // Make densities more aligned for "normalized"
+                normDensityData.datasets.forEach((ds, idx) => {
+                    let mean = 7 + idx*0.5; // Tighter means
+                    let stdDev = 1; // Smaller stdDev
+                     ds.data = normDensityData.labels.map(x => Math.exp(-0.5 * Math.pow((x - mean*2) / (stdDev*1.5), 2)) * 30);
+                });
+                new Chart(document.getElementById('normDensityChart'), {
+                    type: 'line', data: normDensityData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: { y: { title: { display: true, text: '密度 (示意)'}}, x: { title: { display: true, text: '正規化 Log2 強度 (示意)'}}} }
+                });
+            }
+
+            // Batch Effect Charts
+             if (document.getElementById('batchEffectPcaChart')) {
+                new Chart(document.getElementById('batchEffectPcaChart'), {
+                    type: 'scatter', data: createPcaData(60, 3), options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: {x: { title: { display: true, text: '主成分1 (PC1)'}}, y: { title: { display: true, text: '主成分2 (PC2)'}}}}
+                });
+            }
+            if (document.getElementById('batchCorrectedPcaChart')) {
+                new Chart(document.getElementById('batchCorrectedPcaChart'), {
+                    type: 'scatter', data: createPcaDataCorrected(60), options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true }, title: { display: false } }, scales: {x: { title: { display: true, text: '主成分1 (PC1) - 校正後'}}, y: { title: { display: true, text: '主成分2 (PC2) - 校正後'}}}}
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
