@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動式探索：矩陣 AᵀA 的可逆性</title>
+    <title>矩陣 AᵀA 的可逆性</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,8 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Chosen Palette: Calm Harmony (Stone/Slate neutrals with a muted Blue accent) -->
-    <!-- Application Structure Plan: A single-page, vertical-scroll application designed for guided exploration. It starts with the main theorem, then presents an interactive proof flowchart, followed by collapsible deep-dive sections for key concepts. Two interactive modules visualize the n>=m dimensional constraint and the application in least squares. This structure prioritizes learning and discovery over the linear, formal structure of the source report, making abstract concepts more tangible. -->
-    <!-- Visualization & Content Choices: 1. Main Theorem: Presented as a visual flowchart (HTML/CSS divs) to organize the logical steps of the proof interactively. 2. Dimensional Constraint (n>=m): An interactive visualizer with sliders (HTML/JS) to inform the user about this critical prerequisite. 3. Least Squares Application: A scatter plot (Chart.js/Canvas) to relate the abstract theorem to a practical data fitting problem. 4. Core Concepts: Presented in collapsible accordions (HTML/JS) to provide optional detail without cluttering the main flow. -->
+    <!-- Application Structure Plan: A single-page, vertical-scroll application designed for guided exploration. It starts with the main theorem, then presents an interactive proof flowchart, followed by collapsible deep-dive sections for key concepts. Two interactive modules visualize the n>=m dimensional constraint and the application in least squares. The final section on practical detection has been expanded to cover both data analysis and linear algebra methods, bridging theory and practice. -->
+    <!-- Visualization & Content Choices: 1. Main Theorem: Presented as a visual flowchart (HTML/CSS divs) to organize the logical steps of the proof interactively. 2. Dimensional Constraint (n>=m): An interactive visualizer with sliders (HTML/JS) to inform the user about this critical prerequisite. 3. Least Squares Application: A scatter plot (Chart.js/Canvas) to relate the abstract theorem to a practical data fitting problem. 4. Core Concepts: Presented in collapsible accordions (HTML/JS) to provide optional detail without cluttering the main flow. 5. Practical Methods: Expanded section with sub-headings for 'Data Analysis' and 'Linear Algebra' methods, including Correlation, VIF, PCA, Determinant, and Condition Number, with a comprehensive comparison table. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <style>
@@ -92,7 +92,7 @@
     <div class="container mx-auto max-w-5xl px-4 py-8 md:py-12">
 
         <header class="text-center mb-12 md:mb-16">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">互動式探索：矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性</h1>
             <p class="text-lg text-slate-600">一個關於線性代數中重要定理的直觀指南</p>
         </header>
 
@@ -106,7 +106,7 @@
 
         <section class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">證明的邏輯鏈</h2>
-            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理的證明基於一系列優雅的等價關係。下面的流程圖展示了整個邏輯推導的關鍵步驟，將 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性與 <span class="math">A</span> 的性質聯繫起來。</p>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理的證明基於一系列優雅的等價關係。下面的流程圖展示了整個 logique 推導的關鍵步驟，將 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性與 <span class="math">A</span> 的性質聯繫起來。</p>
             <div class="flex flex-col items-center space-y-4">
                 <div class="w-full max-w-md p-4 bg-white border-2 accent-border rounded-lg shadow-md text-center">
                     <h3 class="font-semibold text-lg"><span class="math">A<span class="matrix-sup">T</span>A</span> 可逆</h3>
@@ -196,7 +196,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                    <div id="matrix_ A_vis" class="matrix-grid mb-4"></div>
+                    <div id="matrix_A_vis" class="matrix-grid mb-4"></div>
                     <div id="dimension_result" class="text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300"></div>
                 </div>
             </div>
@@ -213,6 +213,103 @@
                     尋找唯一最佳擬合線
                 </button>
             </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">從理論到實務：檢測資料的共線性問題</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">在數據分析中，「行向量線性獨立」的問題被稱為**共線性 (Collinearity)** 或**多重共線性 (Multicollinearity)**。它指的是資料中的某些特徵（變數）可以由其他特徵線性組合而成，這會導致模型不穩定。以下是幾種檢測方法，涵蓋了從實務應用到線性代數本質的層面。</p>
+            
+            <div class="space-y-8 max-w-4xl mx-auto">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 pb-2 border-b border-slate-200">實務數據分析方法</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">1. 相關係數矩陣 (Correlation Matrix)</h4>
+                            <p class="text-slate-700">這是最快、最直觀的初步檢查方法。我們計算所有特徵兩兩之間的皮爾森相關係數，並用熱圖視覺化。如果兩個特徵之間的相關係數絕對值非常高（例如，經驗上**大於 0.8**），就表示它們之間存在高度的線性關係。</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">2. 變異數膨脹因子 (VIF)</h4>
+                            <p class="text-slate-700">VIF 是業界最常用也最可靠的方法。它衡量每個特徵能被資料集中「其他所有特徵」解釋的程度。VIF 的值越大，表示該特徵的共線性問題越嚴重。判斷標準如下：</p>
+                            <ul class="list-disc list-inside mt-2 text-slate-700">
+                                <li><span class="font-semibold">VIF = 1：</span> 完全沒有共線性。</li>
+                                <li><span class="font-semibold">1 &lt; VIF &lt; 5：</span> 存在中度共線性，通常可接受。</li>
+                                <li><span class="font-semibold">VIF &gt; 10：</span> 存在高度共線性，是明確的警訊，需要處理。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 pb-2 border-b border-slate-200">線性代數診斷方法</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">3. 主成分分析 (PCA) 的特徵值</h4>
+                            <p class="text-slate-700">對資料的相關係數矩陣進行主成分分析後，如果得到的特徵值 (Eigenvalues) 中有**一個或多個接近 0**，就意味著資料中存在線性相依的維度。該特徵值對應的特徵向量能指出是哪些原始特徵的組合導致了共線性。</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">4. AᵀA 的行列式 (Determinant)</h4>
+                            <p class="text-slate-700">直接回到理論核心：一個方陣可逆若且唯若其行列式不為零。因此，我們可以計算矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的行列式。如果 <span class="math">det(A<span class="matrix-sup">T</span>A)</span> **非常接近 0**，則表示 <span class="math">A<span class="matrix-sup">T</span>A</span> 接近奇異（不可逆），暗示 <span class="math">A</span> 的行向量存在嚴重的共線性問題。</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">5. 條件數 (Condition Number)</h4>
+                            <p class="text-slate-700">條件數是衡量一個矩陣對於微小誤差敏感度的指標，它直接反映了矩陣求逆的數值穩定性。對於矩陣 <span class="math">A</span>，其條件數定義為最大奇異值與最小奇異值之比。一個**非常大**的條件數（例如，經驗上**大於 30**）意味著矩陣是「病態的」(ill-conditioned)，即非常接近奇異，這是共線性的直接後果。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 overflow-x-auto">
+                <h3 class="text-2xl font-semibold text-center mb-6">方法比較總結</h3>
+                <table class="min-w-full bg-white border border-slate-300 text-center">
+                    <thead class="bg-slate-100">
+                        <tr>
+                            <th class="py-3 px-4 border-b">方法</th>
+                            <th class="py-3 px-4 border-b">偵測目標</th>
+                            <th class="py-3 px-4 border-b">優點</th>
+                            <th class="py-3 px-4 border-b">缺點</th>
+                            <th class="py-3 px-4 border-b">實務建議</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-700">
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 border-b font-semibold">相關係數矩陣</td>
+                            <td class="py-3 px-4 border-b">成對特徵間的線性關係</td>
+                            <td class="py-3 px-4 border-b text-left">快速、直觀</td>
+                            <td class="py-3 px-4 border-b text-left">無法偵測多重共線性</td>
+                            <td class="py-3 px-4 border-b text-left">EDA 初步快速掃描</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 border-b font-semibold">VIF</td>
+                            <td class="py-3 px-4 border-b">單一特徵與所有其他特徵的關係</td>
+                            <td class="py-3 px-4 border-b text-left">全面、可靠、業界標準</td>
+                            <td class="py-3 px-4 border-b text-left">計算稍複雜</td>
+                            <td class="py-3 px-4 border-b text-left">迴歸模型前的標準診斷</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 border-b font-semibold">PCA 特徵值</td>
+                            <td class="py-3 px-4 border-b">資料中的線性組合維度</td>
+                            <td class="py-3 px-4 border-b text-left">能找出問題的根源組合</td>
+                            <td class="py-3 px-4 border-b text-left">解釋較不直觀</td>
+                            <td class="py-3 px-4 border-b text-left">深度診斷，考慮降維時</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 border-b font-semibold">AᵀA 行列式</td>
+                            <td class="py-3 px-4 border-b">矩陣的可逆性</td>
+                            <td class="py-3 px-4 border-b text-left">理論上直接對應</td>
+                            <td class="py-3 px-4 border-b text-left">對資料尺度敏感，無通用閾值</td>
+                            <td class="py-3 px-4 border-b text-left">理論驗證，較少用於實務診斷</td>
+                        </tr>
+                         <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 border-b font-semibold">條件數</td>
+                            <td class="py-3 px-4 border-b">數值穩定性，對奇異的接近程度</td>
+                            <td class="py-3 px-4 border-b text-left">對共線性的根本性度量</td>
+                            <td class="py-3 px-4 border-b text-left">計算成本較高</td>
+                            <td class="py-3 px-4 border-b text-left">關注模型數值穩定性的進階診斷</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </section>
 
     </div>
@@ -242,7 +339,7 @@
             const mSlider = document.getElementById('cols_m');
             const nValue = document.getElementById('rows_n_value');
             const mValue = document.getElementById('cols_m_value');
-            const matrixVis = document.getElementById('matrix_ A_vis');
+            const matrixVis = document.getElementById('matrix_A_vis');
             const resultDiv = document.getElementById('dimension_result');
 
             function updateDimensionVisualizer() {
