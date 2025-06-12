@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>矩陣 AᵀA 的可逆性</title>
+    <title>矩陣 CᵀC 的可逆性</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Chosen Palette: Calm Harmony (Stone/Slate neutrals with a muted Blue accent) -->
-    <!-- Application Structure Plan: A single-page, vertical-scroll application designed for guided exploration. It starts with the main theorem, then presents an interactive proof flowchart, followed by collapsible deep-dive sections for key concepts. Two interactive modules visualize the n>=m dimensional constraint and the application in least squares. The final section on practical detection has been expanded to cover both data analysis and linear algebra methods, bridging theory and practice. -->
-    <!-- Visualization & Content Choices: 1. Main Theorem: Presented as a visual flowchart (HTML/CSS divs) to organize the logical steps of the proof interactively. 2. Dimensional Constraint (n>=m): An interactive visualizer with sliders (HTML/JS) to inform the user about this critical prerequisite. 3. Least Squares Application: A scatter plot (Chart.js/Canvas) to relate the abstract theorem to a practical data fitting problem. 4. Core Concepts: Presented in collapsible accordions (HTML/JS) to provide optional detail without cluttering the main flow. 5. Practical Methods: Expanded section with sub-headings for 'Data Analysis' and 'Linear Algebra' methods, including Correlation, VIF, PCA, Determinant, and Condition Number, with a comprehensive comparison table. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -92,44 +87,44 @@
     <div class="container mx-auto max-w-5xl px-4 py-8 md:py-12">
 
         <header class="text-center mb-12 md:mb-16">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性</h1>
-            <p class="text-lg text-slate-600">一個關於線性代數中重要定理的直觀指南</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">矩陣 <span class="math">C<span class="matrix-sup">T</span>C</span> 的可逆性</h1>
+            <p class="text-lg text-slate-600">完整證明流程</p>
         </header>
 
         <section class="section-card">
             <h2 class="text-2xl font-bold text-center mb-6">核心問題與答案</h2>
             <div class="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-6 rounded-lg text-center">
-                <p class="text-lg mb-2">給定一個 <span class="math">n &times; m</span> 的矩陣 <span class="math">A</span>，其衍生的 <span class="math">m &times; m</span> 方陣 <span class="math">B = A<span class="matrix-sup">T</span>A</span> 何時為可逆矩陣？</p>
-                <p class="text-xl font-semibold">答案：<span class="accent-text">若且唯若</span>，矩陣 <span class="math">A</span> 的所有<span class="accent-text">行向量（columns）線性獨立</span>。</p>
+                <p class="text-lg mb-2">給定一個 <span class="math">k &times; p</span> 的矩陣 <span class="math">C</span>，其衍生的 <span class="math">p &times; p</span> 方陣 <span class="math">B = C<span class="matrix-sup">T</span>C</span> 何時為可逆矩陣？</p>
+                <p class="text-xl font-semibold">答案：<span class="accent-text">若且唯若</span>，矩陣 <span class="math">C</span> 的所有<span class="accent-text">行向量（columns）線性獨立</span>。</p>
             </div>
         </section>
 
         <section class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">證明的邏輯鏈</h2>
-            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理的證明基於一系列優雅的等價關係。下面的流程圖展示了整個 logique 推導的關鍵步驟，將 <span class="math">A<span class="matrix-sup">T</span>A</span> 的可逆性與 <span class="math">A</span> 的性質聯繫起來。</p>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理的證明基於一系列的等價關係。下面的流程圖展示了整個推導的關鍵步驟，將 <span class="math">C<span class="matrix-sup">T</span>C</span> 的可逆性與 <span class="math">C</span> 的性質聯繫起來。</p>
             <div class="flex flex-col items-center space-y-4">
                 <div class="w-full max-w-md p-4 bg-white border-2 accent-border rounded-lg shadow-md text-center">
-                    <h3 class="font-semibold text-lg"><span class="math">A<span class="matrix-sup">T</span>A</span> 可逆</h3>
+                    <h3 class="font-semibold text-lg"><span class="math">C<span class="matrix-sup">T</span>C</span> 可逆</h3>
                     <p class="text-sm text-slate-500">這是我們的出發點</p>
                 </div>
                 <div class="flow-arrow">&Updownarrow;</div>
                 <div class="w-full max-w-md p-4 bg-white border border-slate-300 rounded-lg shadow text-center">
-                    <h3 class="font-semibold text-lg"><span class="math">N(A<span class="matrix-sup">T</span>A</span>) = {0}</h3>
+                    <h3 class="font-semibold text-lg"><span class="math">N(C<span class="matrix-sup">T</span>C</span>) = {0}</h3>
                     <p class="text-sm text-slate-500">可逆矩陣的核空間僅包含零向量</p>
                 </div>
                 <div class="flow-arrow">&Updownarrow;</div>
                 <div class="w-full max-w-md p-4 bg-blue-100 border border-blue-300 rounded-lg shadow text-center ring-2 ring-blue-200">
-                    <h3 class="font-semibold text-lg accent-text"><span class="math">N(A) = N(A<span class="matrix-sup">T</span>A)</span></h3>
+                    <h3 class="font-semibold text-lg accent-text"><span class="math">N(C) = N(C<span class="matrix-sup">T</span>C)</span></h3>
                     <p class="text-sm text-slate-500 font-medium">這是最關鍵的橋樑！</p>
                 </div>
                 <div class="flow-arrow">&Updownarrow;</div>
                 <div class="w-full max-w-md p-4 bg-white border border-slate-300 rounded-lg shadow text-center">
-                    <h3 class="font-semibold text-lg"><span class="math">N(A)</span> = {0}</h3>
-                    <p class="text-sm text-slate-500">將條件轉移到了矩陣 <span class="math">A</span> 上</p>
+                    <h3 class="font-semibold text-lg"><span class="math">N(C)</span> = {0}</h3>
+                    <p class="text-sm text-slate-500">將條件轉移到了矩陣 <span class="math">C</span> 上</p>
                 </div>
                 <div class="flow-arrow">&Updownarrow;</div>
                 <div class="w-full max-w-md p-4 bg-white border-2 accent-border rounded-lg shadow-md text-center">
-                    <h3 class="font-semibold text-lg">矩陣 <span class="math">A</span> 的行向量線性獨立</h3>
+                    <h3 class="font-semibold text-lg">矩陣 <span class="math">C</span> 的行向量線性獨立</h3>
                     <p class="text-sm text-slate-500">這是最終的充分必要條件</p>
                 </div>
             </div>
@@ -145,9 +140,9 @@
                     </button>
                     <div class="accordion-content">
                         <div class="p-4 border-t border-slate-200 text-slate-700">
-                            <p>一個 <span class="math">m &times; m</span> 的方陣 <span class="math">B</span> 可逆，如果存在另一個矩陣 <span class="math">B<span class="matrix-sup">-1</span></span> 使得 <span class="math">BB<span class="matrix-sup">-1</span> = B<span class="matrix-sup">-1</span>B = I</span>。這有多個等價條件：</p>
+                            <p>一個 <span class="math">p &times; p</span> 的方陣 <span class="math">B</span> 可逆，如果存在另一個矩陣 <span class="math">B<span class="matrix-sup">-1</span></span> 使得 <span class="math">BB<span class="matrix-sup">-1</span> = B<span class="matrix-sup">-1</span>B = I</span>。這有多個等價條件：</p>
                             <ul class="list-disc list-inside mt-2 space-y-1">
-                                <li>其秩等於其維度 <span class="math">m</span> (滿秩)。</li>
+                                <li>其秩等於其維度 <span class="math">p</span> (滿秩)。</li>
                                 <li>其核空間 <span class="math">N(B)</span> 只包含零向量。</li>
                                 <li>其所有行向量（或列向量）線性獨立。</li>
                                 <li>其行列式不為零 <span class="math">det(B) &ne; 0</span>。</li>
@@ -158,19 +153,19 @@
                 </div>
                  <div class="accordion-item bg-white border border-slate-200 rounded-lg">
                     <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
-                        <span>2. 為什麼 <span class="math">N(A) = N(A<span class="matrix-sup">T</span>A)</span>？</span>
+                        <span>2. 為什麼 <span class="math">N(C) = N(C<span class="matrix-sup">T</span>C)</span>？</span>
                         <span class="transform transition-transform duration-300">&#9662;</span>
                     </button>
                     <div class="accordion-content">
                         <div class="p-4 border-t border-slate-200 text-slate-700 space-y-4">
                             <p>這是證明中最巧妙的部分，需要雙向證明：</p>
                             <div>
-                                <h4 class="font-semibold">證明 <span class="math">N(A) &subseteq; N(A<span class="matrix-sup">T</span>A)</span>:</h4>
-                                <p>若 <span class="math">x</span> 在 <span class="math">N(A)</span> 中，則 <span class="math">Ax = 0</span>。用 <span class="math">A<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">A<span class="matrix-sup">T</span>(Ax) = A<span class="matrix-sup">T</span>0</span>，即 <span class="math">A<span class="matrix-sup">T</span>Ax = 0</span>。所以 <span class="math">x</span> 也在 <span class="math">N(A<span class="matrix-sup">T</span>A)</span> 中。</p>
+                                <h4 class="font-semibold">證明 <span class="math">N(C) &subseteq; N(C<span class="matrix-sup">T</span>C)</span>:</h4>
+                                <p>若 <span class="math">x</span> 在 <span class="math">N(C)</span> 中，則 <span class="math">Cx = 0</span>。用 <span class="math">C<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">C<span class="matrix-sup">T</span>(Cx) = C<span class="matrix-sup">T</span>0</span>，即 <span class="math">C<span class="matrix-sup">T</span>Cx = 0</span>。所以 <span class="math">x</span> 也在 <span class="math">N(C<span class="matrix-sup">T</span>C)</span> 中。</p>
                             </div>
                             <div>
-                                <h4 class="font-semibold">證明 <span class="math">N(A<span class="matrix-sup">T</span>A) &subseteq; N(A)</span>:</h4>
-                                <p>若 <span class="math">x</span> 在 <span class="math">N(A<span class="matrix-sup">T</span>A)</span> 中，則 <span class="math">A<span class="matrix-sup">T</span>Ax = 0</span>。用 <span class="math">x<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">x<span class="matrix-sup">T</span>A<span class="matrix-sup">T</span>Ax = 0</span>。這可以寫成 <span class="math">(Ax)<span class="matrix-sup">T</span>(Ax) = 0</span>，也就是向量 <span class="math">Ax</span> 的長度平方 <span class="math">||Ax||<span class="matrix-sup">2</span> = 0</span>。一個向量長度為零，若且唯若該向量本身是零向量。因此 <span class="math">Ax = 0</span>，所以 <span class="math">x</span> 也在 <span class="math">N(A)</span> 中。</p>
+                                <h4 class="font-semibold">證明 <span class="math">N(C<span class="matrix-sup">T</span>C) &subseteq; N(C)</span>:</h4>
+                                <p>若 <span class="math">x</span> 在 <span class="math">N(C<span class="matrix-sup">T</span>C)</span> 中，則 <span class="math">C<span class="matrix-sup">T</span>Cx = 0</span>。用 <span class="math">x<span class="matrix-sup">T</span></span> 左乘，得 <span class="math">x<span class="matrix-sup">T</span>C<span class="matrix-sup">T</span>Cx = 0</span>。這可以寫成 <span class="math">(Cx)<span class="matrix-sup">T</span>(Cx) = 0</span>，也就是向量 <span class="math">Cx</span> 的長度平方 <span class="math">||Cx||<span class="matrix-sup">2</span> = 0</span>。一個向量長度為零，若且唯若該向量本身是零向量。因此 <span class="math">Cx = 0</span>，所以 <span class="math">x</span> 也在 <span class="math">N(C)</span> 中。</p>
                             </div>
                             <p class="font-medium">既然兩個集合互為子集，它們必然相等。</p>
                         </div>
@@ -181,30 +176,30 @@
 
         <section class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">維度約束：一個必要的先決條件</h2>
-            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">為了使矩陣 <span class="math">A</span> 的 <span class="math">m</span> 個行向量線性獨立，<span class="math">A</span> 的維度必須滿足一個基本條件：行數 <span class="math">n</span> 必須大於或等於列數 <span class="math">m</span> (<span class="math">n &ge; m</span>)。請使用下方的滑桿來探索這個概念。</p>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">為了使矩陣 <span class="math">C</span> 的 <span class="math">p</span> 個行向量線性獨立，<span class="math">C</span> 的維度必須滿足一個基本條件：行數 <span class="math">k</span> 必須大於或等於列數 <span class="math">p</span> (<span class="math">k &ge; p</span>)。請使用下方的滑桿來探索這個概念。</p>
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 <div class="flex flex-col items-center">
                     <div class="w-full max-w-sm">
                          <div class="mb-4">
-                            <label for="rows_n" class="font-medium">行數 n = <span id="rows_n_value">5</span></label>
-                            <input type="range" id="rows_n" min="1" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
+                            <label for="rows_k" class="font-medium">行數 k = <span id="rows_k_value">5</span></label>
+                            <input type="range" id="rows_k" min="1" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
                         </div>
                         <div>
-                            <label for="cols_m" class="font-medium">行向量數 m = <span id="cols_m_value">4</span></label>
-                            <input type="range" id="cols_m" min="1" max="10" value="4" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
+                            <label for="cols_p" class="font-medium">行向量數 p = <span id="cols_p_value">4</span></label>
+                            <input type="range" id="cols_p" min="1" max="10" value="4" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-bg">
                         </div>
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                    <div id="matrix_A_vis" class="matrix-grid mb-4"></div>
+                    <div id="matrix_C_vis" class="matrix-grid mb-4"></div>
                     <div id="dimension_result" class="text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300"></div>
                 </div>
             </div>
         </section>
-
+        
         <section class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">應用：最小平方法</h2>
-            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理在數據科學中至關重要。當我們想用一條直線擬合一組數據點時（線性迴歸），我們會求解一個線性系統 <span class="math">Ax = b</span>。通常這個系統沒有精確解，我們會尋找一個「最佳擬合」解，這可以通過求解正規方程 <span class="math">A<span class="matrix-sup">T</span>Ax = A<span class="matrix-sup">T</span>b</span> 來找到。如果 <span class="math">A<span class="matrix-sup">T</span>A</span> 可逆，我們就能找到唯一的最佳解 <span class="math">&xcirc; = (A<span class="matrix-sup">T</span>A)<span class="matrix-sup">-1</span>A<span class="matrix-sup">T</span>b</span>。</p>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">這個定理在數據科學中至關重要。當我們想用一條直線擬合一組數據點時（線性迴歸），我們會求解一個線性系統 <span class="math">Cx = b</span>。通常這個系統沒有精確解，我們會尋找一個「最佳擬合」解，這可以通過求解正規方程 <span class="math">C<span class="matrix-sup">T</span>Cx = C<span class="matrix-sup">T</span>b</span> 來找到。如果 <span class="math">C<span class="matrix-sup">T</span>C</span> 可逆，我們就能找到唯一的最佳解 <span class="math">&xcirc; = (C<span class="matrix-sup">T</span>C)<span class="matrix-sup">-1</span>C<span class="matrix-sup">T</span>b</span>。</p>
             <div class="flex flex-col items-center">
                 <div class="chart-container">
                     <canvas id="leastSquaresChart"></canvas>
@@ -212,6 +207,32 @@
                 <button id="fitLineBtn" class="mt-6 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-transform transform hover:scale-105">
                     尋找唯一最佳擬合線
                 </button>
+            </div>
+        </section>
+        
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">實務上產生共線性的可能情況</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">在實務分析上，以下幾種情況特別容易產生共線性（即矩陣 <span class="math">C</span> 的行向量線性相依）的問題：</p>
+            <div class="max-w-4xl mx-auto text-slate-700 space-y-4">
+                <ul class="list-disc list-outside space-y-3 pl-5">
+                    <li>
+                        <strong class="font-semibold text-slate-800">資料本身的性質與侷限：</strong>
+                        許多變數在真實世界中本來就高度相關。例如，經濟數據中的「人均GDP」與「家庭可支配收入」；物理實驗中的「溫度」與「壓力」；人口學中的「年齡」與「工作經驗」。
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-slate-800">不當的特徵工程 (Feature Engineering)：</strong>
+                        在資料集中同時包含一個變數和它的衍生變數。例如，模型中同時放入「體重」和「身高」，又加入由這兩者算出的「BMI」，必然導致共線性。同樣地，若同時放入「總居住面積」與「臥室面積」、「客廳面積」等細項，也會產生問題。
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-slate-800">虛擬變數陷阱 (Dummy Variable Trap)：</strong>
+                        在處理有 k 個類別的變數時（如「四季」），若將其轉換為 k 個虛擬變數（is_spring, is_summer...），會產生完全共線性，因為知道前 k-1 個就能推斷出最後一個。正確做法是只使用 k-1 個虛擬變數。
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-slate-800">變數過多導致的偶然關係：</strong>
+                        當特徵（變數）的數量 <span class="math">p</span> 遠大於觀測樣本數 <span class="math">k</span> 時（<span class="math">p > k</span>），行向量必定線性相依。這在基因體學（數萬基因 vs. 數百樣本）等領域很常見。
+                    </li>
+
+                </ul>
             </div>
         </section>
 
@@ -247,12 +268,12 @@
                             <p class="text-slate-700">對資料的相關係數矩陣進行主成分分析後，如果得到的特徵值 (Eigenvalues) 中有**一個或多個接近 0**，就意味著資料中存在線性相依的維度。該特徵值對應的特徵向量能指出是哪些原始特徵的組合導致了共線性。</p>
                         </div>
                         <div>
-                            <h4 class="text-xl font-semibold mb-2 accent-text">4. AᵀA 的行列式 (Determinant)</h4>
-                            <p class="text-slate-700">直接回到理論核心：一個方陣可逆若且唯若其行列式不為零。因此，我們可以計算矩陣 <span class="math">A<span class="matrix-sup">T</span>A</span> 的行列式。如果 <span class="math">det(A<span class="matrix-sup">T</span>A)</span> **非常接近 0**，則表示 <span class="math">A<span class="matrix-sup">T</span>A</span> 接近奇異（不可逆），暗示 <span class="math">A</span> 的行向量存在嚴重的共線性問題。</p>
+                            <h4 class="text-xl font-semibold mb-2 accent-text">4. CᵀC 的行列式 (Determinant)</h4>
+                            <p class="text-slate-700">直接回到理論核心：一個方陣可逆若且唯若其行列式不為零。因此，我們可以計算矩陣 <span class="math">C<span class="matrix-sup">T</span>C</span> 的行列式。如果 <span class="math">det(C<span class="matrix-sup">T</span>C)</span> **非常接近 0**，則表示 <span class="math">C<span class="matrix-sup">T</span>C</span> 接近奇異（不可逆），暗示 <span class="math">C</span> 的行向量存在嚴重的共線性問題。</p>
                         </div>
                         <div>
                             <h4 class="text-xl font-semibold mb-2 accent-text">5. 條件數 (Condition Number)</h4>
-                            <p class="text-slate-700">條件數是衡量一個矩陣對於微小誤差敏感度的指標，它直接反映了矩陣求逆的數值穩定性。對於矩陣 <span class="math">A</span>，其條件數定義為最大奇異值與最小奇異值之比。一個**非常大**的條件數（例如，經驗上**大於 30**）意味著矩陣是「病態的」(ill-conditioned)，即非常接近奇異，這是共線性的直接後果。</p>
+                            <p class="text-slate-700">條件數是衡量一個矩陣對於微小誤差敏感度的指標，它直接反映了矩陣求逆的數值穩定性。對於矩陣 <span class="math">C</span>，其條件數定義為最大奇異值與最小奇異值之比。一個**非常大**的條件數（例如，經驗上**大於 30**）意味著矩陣是「病態的」(ill-conditioned)，即非常接近奇異，這是共線性的直接後果。</p>
                         </div>
                     </div>
                 </div>
@@ -293,7 +314,7 @@
                             <td class="py-3 px-4 border-b text-left">深度診斷，考慮降維時</td>
                         </tr>
                         <tr class="hover:bg-slate-50">
-                            <td class="py-3 px-4 border-b font-semibold">AᵀA 行列式</td>
+                            <td class="py-3 px-4 border-b font-semibold">CᵀC 行列式</td>
                             <td class="py-3 px-4 border-b">矩陣的可逆性</td>
                             <td class="py-3 px-4 border-b text-left">理論上直接對應</td>
                             <td class="py-3 px-4 border-b text-left">對資料尺度敏感，無通用閾值</td>
@@ -312,6 +333,24 @@
 
         </section>
 
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-8">如何處理共線性問題 (使 CᵀC 可逆)</h2>
+            <p class="text-center text-slate-600 max-w-3xl mx-auto mb-10">偵測到共線性問題後，我們的目標是消除或減輕特徵（矩陣 <span class="math">C</span> 的行向量）之間的線性相依性，從而使 <span class="math">C<span class="matrix-sup">T</span>C</span> 變得可逆或在數值上更穩定。以下是三種常用的處理策略：</p>
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2 accent-text">1. 移除特徵 (Feature Removal)</h3>
+                    <p class="text-slate-700">這是最直接的方法。根據 VIF 分數或相關係數矩陣，找出共線性最高的特徵。一個常見的策略是：找出 VIF 最高的特徵，將其移除，然後重新計算剩餘特徵的 VIF。重複此過程，直到所有特徵的 VIF 都低於預設的閾值（如 5 或 10）。選擇移除哪個特徵時，也可以基於領域知識，保留更重要或更易於解釋的特徵。</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2 accent-text">2. 合併或轉換特徵 (Feature Combination / Transformation)</h3>
+                    <p class="text-slate-700">與其丟棄資訊，不如將相關的特徵合併。例如，若「臥室數量」與「浴室數量」高度相關，可以創建一個新特徵「臥室與浴室總數」。一個更系統化、更強大的方法是**主成分分析 (PCA)**。PCA 可以將原始的相關特徵轉換為一組新的、彼此線性無關的特徵（稱為主成分）。然後，你可以選擇使用這些主成分來建立模型，從根本上消除共線性問題。</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2 accent-text">3. 使用正規化方法 (Regularization)</h3>
+                    <p class="text-slate-700">有些模型算法本身就能處理共線性問題。**嶺迴歸 (Ridge Regression)** 是一個經典例子。它在最小平方法的目標函數中加入一個懲罰項，這在數學上等同於對矩陣 <span class="math">C<span class="matrix-sup">T</span>C</span> 加上一個微小的對角矩陣 (<span class="math">&lambda;I</span>)，即求解 <span class="math">(C<span class="matrix-sup">T</span>C + &lambda;I)x = C<span class="matrix-sup">T</span>b</span>。這個微小的擾動確保了 <span class="math">(C<span class="matrix-sup">T</span>C + &lambda;I)</span> 矩陣始終是可逆的，從而得到一個穩定且唯一的解。另一種方法如 Lasso 迴歸，則可以透過將某些特徵的係數壓縮至零，來達到自動選擇特徵的效果。</p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -335,39 +374,39 @@
             });
 
             // Dimensional Constraint Visualizer
-            const nSlider = document.getElementById('rows_n');
-            const mSlider = document.getElementById('cols_m');
-            const nValue = document.getElementById('rows_n_value');
-            const mValue = document.getElementById('cols_m_value');
-            const matrixVis = document.getElementById('matrix_A_vis');
+            const kSlider = document.getElementById('rows_k');
+            const pSlider = document.getElementById('cols_p');
+            const kValue = document.getElementById('rows_k_value');
+            const pValue = document.getElementById('cols_p_value');
+            const matrixVis = document.getElementById('matrix_C_vis');
             const resultDiv = document.getElementById('dimension_result');
 
             function updateDimensionVisualizer() {
-                const n = parseInt(nSlider.value);
-                const m = parseInt(mSlider.value);
-                nValue.textContent = n;
-                mValue.textContent = m;
+                const k = parseInt(kSlider.value);
+                const p = parseInt(pSlider.value);
+                kValue.textContent = k;
+                pValue.textContent = p;
 
                 matrixVis.innerHTML = '';
-                matrixVis.style.gridTemplateColumns = `repeat(${m}, 20px)`;
+                matrixVis.style.gridTemplateColumns = `repeat(${p}, 20px)`;
                 
-                for (let i = 0; i < n * m; i++) {
+                for (let i = 0; i < k * p; i++) {
                     const cell = document.createElement('div');
                     cell.classList.add('matrix-cell');
                     matrixVis.appendChild(cell);
                 }
 
-                if (n < m) {
-                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-red-800">行向量線性相依</h4><p class="text-red-700">行數 (n=${n}) 小於行向量數 (m=${m})。<br>在 ${n} 維空間中，${m} 個向量必定線性相依。<br>因此 <span class="font-semibold">A<span class="matrix-sup">T</span>A</span> 必不可逆。</p>`;
+                if (k < p) {
+                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-red-800">行向量線性相依</h4><p class="text-red-700">行數 (k=${k}) 小於行向量數 (p=${p})。<br>在 ${k} 維空間中，${p} 個向量必定線性相依。<br>因此 <span class="font-semibold">C<span class="matrix-sup">T</span>C</span> 必不可逆。</p>`;
                     resultDiv.className = 'text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300 bg-red-100 border border-red-200';
                 } else {
-                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-green-800">行向量可能線性獨立</h4><p class="text-green-700">行數 (n=${n}) 大於或等於行向量數 (m=${m})。<br>滿足了行向量線性獨立的必要條件。<br>因此 <span class="font-semibold">A<span class="matrix-sup">T</span>A</span> 可能為可逆。</p>`;
+                    resultDiv.innerHTML = `<h4 class="font-bold text-lg text-green-800">行向量可能線性獨立</h4><p class="text-green-700">行數 (k=${k}) 大於或等於行向量數 (p=${p})。<br>滿足了行向量線性獨立的必要條件。<br>因此 <span class="font-semibold">C<span class="matrix-sup">T</span>C</span> 可能為可逆。</p>`;
                     resultDiv.className = 'text-center p-4 rounded-lg w-full max-w-sm transition-colors duration-300 bg-green-100 border border-green-200';
                 }
             }
 
-            nSlider.addEventListener('input', updateDimensionVisualizer);
-            mSlider.addEventListener('input', updateDimensionVisualizer);
+            kSlider.addEventListener('input', updateDimensionVisualizer);
+            pSlider.addEventListener('input', updateDimensionVisualizer);
             updateDimensionVisualizer();
 
             // Least Squares Chart
