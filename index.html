@@ -42,16 +42,18 @@
             font-size: 1.1rem;
         }
 
-        /* --- 兩大區塊的容器 --- */
+        /* --- 區塊的容器 --- */
         .sections-wrapper {
             display: flex;
             gap: 2rem; /* 區塊間的距離 */
             text-align: left;
+            flex-wrap: wrap; /* 允許換行 */
         }
 
         /* --- 單一區塊的樣式 --- */
         .link-section {
-            flex: 1; /* 讓兩個區塊等寬 */
+            flex: 1; /* 讓區塊等寬 */
+            min-width: 280px; /* 設定最小寬度 */
         }
 
         .link-section h2 {
@@ -92,11 +94,14 @@
             border-left-color: #e74c3c; /* 改變裝飾條顏色 */
         }
 
-        /* --- 響應式設計：在小螢幕上變為單欄 --- */
-        @media (max-width: 768px) {
+        /* --- 響應式設計：適應不同螢幕尺寸 --- */
+        @media (max-width: 900px) {
             .sections-wrapper {
                 flex-direction: column;
             }
+        }
+        
+        @media (max-width: 768px) {
             .container {
                 padding: 1.5rem;
             }
