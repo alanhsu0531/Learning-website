@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaTeX 學習筆記：從入門到大師</title>
+    <style>
+        /* --- 整體與字體設定 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            line-height: 1.7;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- 主要佈局 --- */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- 側邊導覽列 --- */
+        .sidebar {
+            width: 260px;
+            position: -webkit-sticky; /* For Safari */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li a {
+            display: block;
+            color: #343a40;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar ul li a:hover {
+            background-color: #e9ecef;
+            color: #000;
+        }
+        .sidebar .sub-menu {
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+
+
+        /* --- 主要內容區 --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px 40px;
+        }
+
+        header {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        header h1 {
+            font-size: 2.8em;
+            color: #343a40;
+            margin: 0;
+        }
+        header p {
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+
+        section {
+            margin-bottom: 40px;
+            padding-top: 20px; /* For anchor scrolling */
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #0056b3;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #17a2b8;
+        }
+        
+        strong {
+            color: #c82333;
+        }
+
+        /* --- 程式碼與表格樣式 --- */
+        pre, code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+        pre {
+            background-color: #eef1f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #d1d9e1;
+        }
+        code {
+            background-color: #eef1f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+        thead th {
+            background-color: #0056b3;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* --- 響應式設計 --- */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h3>快速導覽</h3>
+            <ul>
+                <li><a href="#part1">Part 1: 核心概念</a></li>
+                <li><a href="#part2">Part 2: 首份文件</a></li>
+                <li><a href="#part3">Part 3: 結構與排版</a></li>
+                 <ul class="sub-menu">
+                    <li><a href="#part3-1">3.1 標題資訊</a></li>
+                    <li><a href="#part3-2">3.2 章節目錄</a></li>
+                    <li><a href="#part3-3">3.3 文字格式</a></li>
+                    <li><a href="#part3-4">3.4 列表</a></li>
+                </ul>
+                <li><a href="#part4">Part 4: 數學模式</a></li>
+                <ul class="sub-menu">
+                    <li><a href="#part4-1">4.1 兩種模式</a></li>
+                    <li><a href="#part4-2">4.2 常用指令</a></li>
+                    <li><a href="#part4-3">4.3 多行與矩陣</a></li>
+                </ul>
+                <li><a href="#part5">Part 5: 圖、表、引用</a></li>
+                <li><a href="#part6">Part 6: 文獻管理</a></li>
+                <li><a href="#part7">Part 7: 邁向大師</a></li>
+                <li><a href="#part8">Part 8: 速查表</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header>
+                <h1>LaTeX 學習筆記</h1>
+                <p>一份從入門到大師的完整指南，助您快速掌握專業文件排版。</p>
+            </header>
+
+            <section id="part1">
+                <h2>第一部分：核心概念與基礎</h2>
+                <h3>1.1 什麼是 LaTeX？</h3>
+                <p>與 Microsoft Word 這類「所見即所得」(WYSIWYG) 的編輯器不同，LaTeX 是一種「所想即所得」的<strong>排版系統</strong>。</p>
+                <ul>
+                    <li><strong>Word</strong>: 您直接調整外觀，專注於視覺呈現。</li>
+                    <li><strong>LaTeX</strong>: 您用標記語言 (markup) 描述文件的<strong>結構</strong> (如 <code>\section{標題}</code>)，LaTeX 引擎會自動生成專業、美觀的文件。您專注於<strong>內容</strong>。</li>
+                </ul>
+                <h3>1.2 為什麼要用 LaTeX？</h3>
+                <p>專業排版、高度穩定、自動化、專注內容、免費與跨平台。</p>
+                <h3>1.3 如何開始？</h3>
+                <p>初學者最推薦使用線上平台 <strong>Overleaf</strong> (<a href="https://www.overleaf.com" target="_blank">https://www.overleaf.com</a>)，無需安裝，註冊即用。</p>
+            </section>
+
+            <section id="part2">
+                <h2>第二部分：第一份 LaTeX 文件</h2>
+                <p>所有 LaTeX 文件都遵循一個基本結構。這是一個最小可運行的範例：</p>
+<pre><code>% --- 前導區 (Preamble) ---
+\documentclass{article} % 設定文件類型
+
+% --- 正文區 (Body) ---
+\begin{document}
+
+Hello, LaTeX world!
+這裡是我的第一份 LaTeX 文件。
+
+\end{document}</code></pre>
+                <ul>
+                    <li><code>%</code> 是單行註解。</li>
+                    <li><code>\documentclass{...}</code> 定義文件類型，如 <code>article</code>, <code>report</code>, <code>book</code>, <code>beamer</code>。</li>
+                    <li><code>\begin{document}</code> 和 <code>\end{document}</code> 之間是文件的正文。</li>
+                </ul>
+            </section>
+
+            <section id="part3">
+                <h2>第三部分：文件結構與排版</h2>
+                <h3 id="part3-1">3.1 標題、作者與日期</h3>
+<pre><code>\documentclass{article}
+
+\title{我的 LaTeX 學習筆記}
+\author{你的名字}
+\date{\today}
+
+\begin{document}
+
+\maketitle % 產生標題
+
+\end{document}</code></pre>
+
+                <h3 id="part3-2">3.2 章節與目錄</h3>
+                <ul>
+                    <li>章節指令：<code>\section{...}</code>, <code>\subsection{...}</code>, <code>\subsubsection{...}</code></li>
+                    <li>自動生成目錄：在需要的地方加上 <code>\tableofcontents</code>。</li>
+                </ul>
+
+                <h3 id="part3-3">3.3 文字格式化</h3>
+                <ul>
+                    <li>粗體: <code>\textbf{重要的文字}</code></li>
+                    <li>斜體: <code>\textit{強調的文字}</code></li>
+                    <li>底線: <code>\underline{加底線的文字}</code></li>
+                    <li>強制換行: <code>\\</code> 或 <code>\newline</code></li>
+                    <li>分段: 連續按兩次 Enter (留一個空行)。</li>
+                </ul>
+
+                <h3 id="part3-4">3.4 列表</h3>
+                <p>項目符號列表 (itemize):</p>
+<pre><code>\begin{itemize}
+    \item 第一項
+    \item 第二項
+\end{itemize}</code></pre>
+                <p>編號列表 (enumerate):</p>
+<pre><code>\begin{enumerate}
+    \item 第一點
+    \item 第二點
+\end{enumerate}</code></pre>
+            </section>
+            
+            <section id="part4">
+                <h2>第四部分：數學模式 (LaTeX 的殺手鐧)</h2>
+                <p>在您的前導區加入 <code>\usepackage{amsmath}</code> 以啟用更強大的數學功能。</p>
+                <h3 id="part4-1">4.1 兩種模式</h3>
+                <ul>
+                    <li><strong>行內模式 (Inline)</strong>: 使用 <code>$...$</code> 包圍。範例：愛因斯坦的質能等價公式是 $E=mc^2$。</li>
+                    <li><strong>展示模式 (Display)</strong>: 使用 <code>\[...\]</code> 包圍。範例：\[ E=mc^2 \]</li>
+                </ul>
+                <h3 id="part4-2">4.2 常用數學指令</h3>
+                <ul>
+                    <li>上下標: <code>^</code> (上標), <code>_</code> (下標)。例如 <code>$x^2$</code>, <code>$a_{10}$</code>。</li>
+                    <li>分數: <code>\frac{分子}{分母}</code>。例如 <code>$\frac{1}{2}$</code>。</li>
+                    <li>根號: <code>\sqrt[n]{...}</code>。例如 <code>$\sqrt{2}$</code>, <code>$\sqrt[3]{8}$</code>。</li>
+                    <li>希臘字母: <code>\alpha</code>, <code>\beta</code>, <code>\Gamma</code>。</li>
+                    <li>總和/積分: <code>\sum_{i=1}^{n} i</code>, <code>\int_{a}^{b} f(x) \,dx</code>。</li>
+                </ul>
+                <h3 id="part4-3">4.3 多行公式與矩陣</h3>
+                <p>對齊的多行公式 (align):</p>
+<pre><code>\begin{align*} % * 表示不編號
+f(x) &= (x+1)^2 \\
+     &= x^2 + 2x + 1
+\end{align*}</code></pre>
+                <p>矩陣 (pmatrix):</p>
+<pre><code>A = \begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}</code></pre>
+            </section>
+            
+            <section id="part5">
+                <h2>第五部分：圖形、表格與交叉引用</h2>
+                <p>插入圖片需要 <code>\usepackage{graphicx}</code>。</p>
+<pre><code>\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{your_image.png}
+    \caption{圖片說明文字}
+    \label{fig:my_figure}
+\end{figure}</code></pre>
+                <p>建立表格：</p>
+<pre><code>\begin{table}[h!]
+    \centering
+    \caption{表格說明文字}
+    \label{tab:my_table}
+    \begin{tabular}{|l|c|r|}
+        \hline
+        姓名 & 分數 & 排名 \\ \hline
+        小明 & 95 & 1 \\
+        小華 & 92 & 2 \\ \hline
+    \end{tabular}
+\end{table}</code></pre>
+                <p>交叉引用：使用 <code>\label{...}</code> 設定標籤，再用 <code>\ref{...}</code> 引用編號。範例：如圖 <code>\ref{fig:my_figure}</code> 所示。</p>
+            </section>
+            
+            <section id="part6">
+                <h2>第六部分：文獻管理 (BibTeX)</h2>
+                <ol>
+                    <li><strong>建立 <code>.bib</code> 檔</strong> (例如 <code>references.bib</code>)，存放文獻資料。</li>
+                    <li><strong>在主文件中引用</strong>: 在內文使用 <code>\cite{文獻key}</code>。</li>
+                    <li><strong>產生文獻列表</strong>: 在文件結尾加入 <code>\bibliographystyle{plain}</code> 和 <code>\bibliography{references}</code>。</li>
+                </ol>
+                <p>Overleaf 會自動處理編譯流程。</p>
+            </section>
+
+            <section id="part7">
+                <h2>第七部分：邁向大師之路</h2>
+                <p>探索更多強大的宏包 (Packages) 來客製化您的文件：</p>
+                <ul>
+                    <li><code>\usepackage{geometry}</code>: 輕鬆設定頁面邊界。</li>
+                    <li><code>\usepackage{hyperref}</code>: 讓文件內的引用和目錄變成可點擊的超連結。</li>
+                    <li><code>\usepackage{booktabs}</code>: 繪製更專業的三線表。</li>
+                    <li><code>\usepackage{tikz}</code>: 用程式碼繪製任何您能想像的圖形。</li>
+                </ul>
+                <p>使用 <code>\newcommand{\R}{\mathbb{R}}</code> 來建立自己的常用指令，可以大幅提升效率。</p>
+            </section>
+            
+            <section id="part8">
+                <h2>第八部分：速查表</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>功能</th>
+                            <th>LaTeX 指令 / 範例</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>文件類型</td><td><code>\documentclass{article}</code></td></tr>
+                        <tr><td>標題資訊</td><td><code>\title{...}, \author{...}, \maketitle</code></td></tr>
+                        <tr><td>章節</td><td><code>\section{...}, \subsection{...}</code></td></tr>
+                        <tr><td>目錄</td><td><code>\tableofcontents</code></td></tr>
+                        <tr><td>粗體 / 斜體</td><td><code>\textbf{text}</code> / <code>\textit{text}</code></td></tr>
+                        <tr><td>項目列表</td><td><code>\begin{itemize} \item ... \end{itemize}</code></td></tr>
+                        <tr><td>編號列表</td><td><code>\begin{enumerate} \item ... \end{enumerate}</code></td></tr>
+                        <tr><td>數學宏包</td><td><code>\usepackage{amsmath}</code></td></tr>
+                        <tr><td>行內/展示公式</td><td><code>$...$</code> / <code>\[...\]</code></td></tr>
+                        <tr><td>上/下標</td><td><code>$x^2$</code>, <code>$x_{ij}$</code></td></tr>
+                        <tr><td>分數</td><td><code>\frac{a}{b}</code></td></tr>
+                        <tr><td>多行對齊公式</td><td><code>\begin{align*} ... & ... \\ ... \end{align*}</code></td></tr>
+                        <tr><td>插入圖片</td><td><code>\usepackage{graphicx}</code>, <code>\includegraphics[...]{file}</code></td></tr>
+                        <tr><td>表格</td><td><code>\begin{tabular}{...} ... & ... \end{tabular}</code></td></tr>
+                        <tr><td>標籤/引用</td><td><code>\label{key}</code> / <code>\ref{key}</code></td></tr>
+                        <tr><td>文獻引用</td><td><code>\cite{key}</code></td></tr>
+                        <tr><td>文獻列表</td><td><code>\bibliographystyle{style}</code>, <code>\bibliography{file}</code></td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
