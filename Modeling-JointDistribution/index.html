@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaTeX 終極攻略與完整使用手冊</title>
+    <title>LaTeX 終極攻略與完整使用手冊 v2.0</title>
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -21,6 +21,7 @@
             color: var(--text-dark);
             margin: 0;
             padding: 0;
+            scroll-behavior: smooth;
         }
         .container { display: flex; max-width: 1600px; margin: 0 auto; }
         .sidebar {
@@ -91,48 +92,20 @@
             <ul>
                 <li><a href="#intro">導讀：為何成為大師</a></li>
                 <li><a href="#part1">第一章：基礎建設</a></li>
-                <ul class="sub-menu">
-                    <li><a href="#part1-1">1.1 思維轉變</a></li>
-                    <li><a href="#part1-2">1.2 環境選擇</a></li>
-                </ul>
                 <li><a href="#part2">第二章：初探門徑</a></li>
+                <li><a href="#part3">第三章：文件結構與組織</a></li>
                  <ul class="sub-menu">
-                    <li><a href="#part2-1">2.1 文件骨架</a></li>
-                    <li><a href="#part2-2">2.2 編譯的秘密</a></li>
-                </ul>
-                <li><a href="#part3">第三章：文本藝術</a></li>
-                 <ul class="sub-menu">
-                    <li><a href="#part3-1">3.1 文件類型與宏包</a></li>
-                    <li><a href="#part3-2">3.2 結構化寫作</a></li>
-                    <li><a href="#part3-3">3.3 精細排版</a></li>
-                    <li><a href="#part3-4">3.4 空間與間距</a></li>
+                    <li><a href="#part3-1">3.1 宏觀結構</a></li>
+                    <li><a href="#part3-2">3.2 階層化指令</a></li>
+                    <li><a href="#part3-3">3.3 列表的藝術</a></li>
+                    <li><a href="#part3-4">3.4 自動化索引</a></li>
+                    <li><a href="#part3-5">3.5 標準文件組件</a></li>
+                    <li><a href="#part3-6">3.6 大型專案管理</a></li>
                 </ul>
                 <li><a href="#part4">第四章：數學魔法</a></li>
-                <ul class="sub-menu">
-                    <li><a href="#part4-1">4.1 數學環境</a></li>
-                    <li><a href="#part4-2">4.2 符號大全</a></li>
-                    <li><a href="#part4-3">4.3 矩陣與多行公式</a></li>
-                    <li><a href="#part4-4">4.4 文字與編號</a></li>
-                </ul>
                 <li><a href="#part5">第五章：圖文並茂</a></li>
-                <ul class="sub-menu">
-                    <li><a href="#part5-1">5.1 浮動體奧義</a></li>
-                    <li><a href="#part5-2">5.2 圖像完全指南</a></li>
-                    <li><a href="#part5-3">5.3 專業級表格</a></li>
-                    <li><a href="#part5-4">5.4 交叉引用</a></li>
-                </ul>
                 <li><a href="#part6">第六章：文獻管理</a></li>
-                 <ul class="sub-menu">
-                    <li><a href="#part6-1">6.1 BibTeX工作流</a></li>
-                    <li><a href="#part6-2">6.2 引用風格</a></li>
-                    <li><a href="#part6-3">6.3 現代方案BibLaTeX</a></li>
-                </ul>
                 <li><a href="#part7">第七章：大師之路</a></li>
-                 <ul class="sub-menu">
-                    <li><a href="#part7-1">7.1 自訂命令與環境</a></li>
-                    <li><a href="#part7-2">7.2 偵錯心法</a></li>
-                    <li><a href="#part7-3">7.3 推薦工作流程</a></li>
-                </ul>
                 <li><a href="#part8">附錄：快速參考</a></li>
             </ul>
         </nav>
@@ -140,7 +113,7 @@
         <main class="main-content">
             <header>
                 <h1>LaTeX 終極攻略與完整使用手冊</h1>
-                <p>從零到一，從入門到精通，一份涵蓋所有核心功能的實戰指南。</p>
+                <p>一份從入門到精通，涵蓋所有核心功能的實戰指南 (v2.0 結構增強版)。</p>
             </header>
 
             <section id="intro">
@@ -148,10 +121,10 @@
                 <p>學習 LaTeX 不僅僅是學習一個軟體，更是學習一種專業、嚴謹的學術寫作思維。當您能夠駕馭 LaTeX，您將從繁瑣的格式調整中解放出來，專注於內容創作，並產出無論在美觀度、一致性還是專業性上都無可挑剔的文件。</p>
                 <blockquote>這份手冊的目標，是帶您走過這條從新手到大師的完整路徑。每一章都是一個等級的提升，請跟隨指引，開始您的 LaTeX 探索之旅。</blockquote>
             </section>
-
+            
             <section id="part1">
                 <h2>第一章：基礎建設 (Lv.1 初心者)</h2>
-                <h3 id="part1-1">1.1 思維轉變：從「所見即所得」到「所想即所得」</h3>
+                 <h3 id="part1-1">1.1 思維轉變：從「所見即所得」到「所想即所得」</h3>
                 <p>忘掉 Word 的操作模式。在 LaTeX 中，您是導演，而不是演員。您通過撰寫「劇本」（<code>.tex</code> 檔案）來告訴 LaTeX 引擎如何排演這部「作品」（<code>.pdf</code> 檔案）。</p>
                 <ul>
                     <li><strong>關注結構</strong>：您只需定義「這是一級標題」 (<code>\section{...}</code>)，而無需關心它該用多大的字體、距離上面多遠。</li>
@@ -221,57 +194,146 @@ Hello, world! This is the beginning of a beautiful document.
                 </ol>
                 <div class="pro-tip">這就是為什麼有時候需要編譯兩次：第一次編譯收集引用資訊寫入 <code>.aux</code>，第二次編譯再讀取 <code>.aux</code> 檔案以顯示正確的編號。</div>
             </section>
-
+            
             <section id="part3">
-                <h2>第三章：文本藝術 (Lv.3 撰稿人)</h2>
-                <h3 id="part3-1">3.1 文件類型 (Document Class) 與宏包 (Packages)</h3>
-                <h4>常見文件類型</h4>
-                <ul>
-                    <li><code>article</code>: 短文、學術期刊論文、報告。</li>
-                    <li><code>report</code>: 較長的文件，如學士或碩士論文，支援 <code>\chapter</code>。</li>
-                    <li><code>book</code>: 書籍，支援雙面排版、前言 (front matter)、正文 (main matter) 和後記 (back matter)。</li>
-                    <li><code>beamer</code>: 製作學術簡報 (PPT)。</li>
+                <h2>第三章：文件結構與組織 (Lv.3 撰稿人)</h2>
+                <p>本章節深入探討如何使用 LaTeX 的指令來組織一份從簡單文章到複雜書籍的任何文件。</p>
+
+                <h3 id="part3-1">3.1 宏觀結構：文件類型與書籍結構</h3>
+                <h4>常見文件類型 (Document Class)</h4>
+                 <ul>
+                    <li><code>article</code>: 短文、學術期刊論文、報告。最基本的文件類型。</li>
+                    <li><code>report</code>: 較長的文件，如學士或碩士論文。與 article 的主要區別是它支援 <code>\chapter</code> 指令，且預設為單面排版。</li>
+                    <li><code>book</code>: 書籍。支援 <code>\chapter</code>，預設為雙面排版，並提供更完整的書籍結構指令。</li>
+                    <li><code>beamer</code>: 製作學術簡報 (PPT)。其結構指令與前三者有很大不同。</li>
                 </ul>
-                <h4>必備宏包</h4>
-                <p>宏包是擴充 LaTeX 功能的模組。使用 <code>\usepackage{宏包名}</code> 來載入。</p>
-<pre><code>\usepackage{amsmath}       % 增強數學公式
-\usepackage{graphicx}      % 插入圖片
-\usepackage{geometry}      % 設定頁面邊界，例如: \geometry{a4paper, margin=1in}
-\usepackage{hyperref}      % 產生可點擊的PDF超連結，建議放在最後載入
-\usepackage[UTF8]{ctex}     % (中文用戶) 完美支援中文排版，自動處理字體等問題
+
+                <h4>書籍/報告的專業結構指令</h4>
+                <p>對於 <code>book</code> 和 <code>report</code> 類型，您可以使用以下指令來區分文件的不同部分：</p>
+                <ul>
+                    <li><code>\frontmatter</code>: 用於書籍的前言部分（如致謝、目錄、序言）。此指令會將頁碼切換為羅馬數字 (i, ii, iii...)，且章節不會被編號。</li>
+                    <li><code>\mainmatter</code>: 用於書籍的正文部分。此指令會重置頁碼並切換為阿拉伯數字 (1, 2, 3...)，章節也會開始正常編號。</li>
+                    <li><code>\backmatter</code>: 用於書籍的後記部分（如附錄、參考文獻、索引）。章節通常不會被編號，但頁碼會繼續。</li>
+                </ul>
+<pre><code>\documentclass{book}
+\begin{document}
+\frontmatter
+\chapter{Acknowledgements} % 顯示為 "Acknowledgements", 不編號
+\tableofcontents
+
+\mainmatter
+\chapter{Introduction} % 顯示為 "Chapter 1: Introduction"
+...
+
+\backmatter
+\appendix
+\chapter{Data Tables} % 附錄章節
+\end{document}</code></pre>
+
+                <h3 id="part3-2">3.2 階層化指令 (Sectioning Commands)</h3>
+                <p>LaTeX 提供了一套完整的階層指令來組織您的內容。它們會自動編號並出現在目錄中。</p>
+                <table>
+                    <thead><tr><th>指令</th><th>階層等級</th><th>適用文件類型</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>\part{...}</code></td><td>0</td><td>所有</td></tr>
+                        <tr><td><code>\chapter{...}</code></td><td>1</td><td>book, report</td></tr>
+                        <tr><td><code>\section{...}</code></td><td>2</td><td>所有</td></tr>
+                        <tr><td><code>\subsection{...}</code></td><td>3</td><td>所有</td></tr>
+                        <tr><td><code>\subsubsection{...}</code></td><td>4</td><td>所有</td></tr>
+                        <tr><td><code>\paragraph{...}</code></td><td>5</td><td>所有</td></tr>
+                        <tr><td><code>\subparagraph{...}</code></td><td>6</td><td>所有</td></tr>
+                    </tbody>
+                </table>
+                <div class="pro-tip">預設情況下，<code>\paragraph</code> 和 <code>\subparagraph</code> 的標題會跟隨文字顯示在同一行。若要讓它們獨立成行，需要修改文件類型的定義，這屬於進階客製化。</div>
+                
+                <h3 id="part3-3">3.3 列表的藝術 (The Art of Lists)</h3>
+                <h4>標準列表環境</h4>
+                <ul>
+                    <li><strong>itemize</strong>: 項目符號列表。</li>
+                    <li><strong>enumerate</strong>: 編號列表。</li>
+                    <li><strong>description</strong>: 描述性列表，適合用於術語定義。</li>
+                </ul>
+<pre><code>\begin{description}
+    \item[LaTeX] A high-quality typesetting system.
+    \item[BibTeX] A tool for managing references in LaTeX.
+\end{description}</code></pre>
+
+                <h4>客製化列表</h4>
+                <p>您可以輕鬆地客製化列表的標籤。</p>
+                <ul>
+                    <li><strong>手動修改單項標籤</strong>: 在 <code>\item</code> 後加上 <code>[...]</code>。</li>
+<pre><code>\begin{itemize}
+    \item[+] The first item.
+    \item[-] The second item.
+\end{itemize}</code></pre>
+                    <li><strong>全局修改編號樣式</strong>: 在前導區使用 <code>\renewcommand</code>。需要 <code>enumitem</code> 宏包可以更方便地做到。</li>
+<pre><code>% 在前導區加入
+\renewcommand{\labelenumi}{\alph{enumi})} % 將第一層編號改為 a), b), ...
+\renewcommand{\labelenumii}{(\roman{enumii})} % 將第二層編號改為 (i), (ii), ...
+
+% 在正文使用
+\begin{enumerate}
+    \item Level one, item one.
+    \begin{enumerate}
+        \item Level two, item one.
+    \end{enumerate}
+\end{enumerate}
 </code></pre>
                 
-                <h3 id="part3-2">3.2 結構化寫作</h3>
-<pre><code>\tableofcontents % 自動生成目錄
+                <h3 id="part3-4">3.4 自動化索引 (Automated Lists)</h3>
+                <p>在您的文件中放置以下指令，LaTeX 會在每次編譯時自動生成並更新對應的列表。</p>
+                <ul>
+                    <li><code>\tableofcontents</code>: 生成目錄。</li>
+                    <li><code>\listoffigures</code>: 生成圖目錄。</li>
+                    <li><code>\listoftables</code>: 生成表目錄。</li>
+                </ul>
+                <div class="warning">這些指令通常需要至少兩次編譯才能獲得正確的頁碼。第一次收集資訊，第二次生成列表。</div>
 
-\chapter{Introduction} % 僅 book 和 report 類型支援
-\section{Background}
-\subsection{Previous Work}
-\subsubsection{A Key Study}
-\paragraph{A Specific Point}
-...</code></pre>
-                
-                <h3 id="part3-3">3.3 精細排版</h3>
-                <h4>文字格式</h4>
+                <h3 id="part3-5">3.5 標準文件組件 (Standard Document Components)</h3>
+                <h4>摘要 (Abstract)</h4>
+                <p>對於 <code>article</code> 和 <code>report</code>，可以使用 <code>abstract</code> 環境來創建摘要。</p>
+<pre><code>\begin{abstract}
+This paper presents a comprehensive guide to LaTeX...
+\end{abstract}</code></pre>
+
+                <h4>附錄 (Appendix)</h4>
+                <p>使用 <code>\appendix</code> 指令來標記附錄部分的開始。此指令會將章節的編號方式從數字改為大寫字母 (A, B, C...)。</p>
+<pre><code>... % 正文結束
+
+\appendix
+\section{Derivation of the Formula}
+The derivation is as follows...
+</code></pre>
+
+                <h3 id="part3-6">3.6 大型專案管理：模組化文件</h3>
+                <p>當您撰寫論文或書籍時，將所有內容放在一個巨大的 <code>.tex</code> 檔案中是災難的開始。您應該將每一章或每一節拆分成獨立的 <code>.tex</code> 檔案，然後在主文件中將它們組合起來。</p>
+                <h4>\input vs. \include</h4>
+                <p>兩者都可以引入外部檔案，但有重要區別：</p>
                 <ul>
-                    <li><strong>粗體</strong>: <code>\textbf{text}</code></li>
-                    <li><em>斜體</em>: <code>\textit{text}</code> (用於一般強調)</li>
-                    <li><u>底線</u>: <code>\underline{text}</code></li>
-                    <li>強調: <code>\emph{text}</code> (LaTeX 會根據上下文自動選擇正體或斜體，更語義化)</li>
-                    <li>字體大小: <code>{\tiny tiny text}</code>, <code>{\small small text}</code>, <code>{\large Large text}</code>, <code>{\Huge HUGE text}</code> (用大括號限制作用範圍)</li>
-                    <li>字體族系: <code>\textrm{Roman}</code>, <code>\textsf{Sans Serif}</code>, <code>\texttt{Typewriter}</code></li>
+                    <li><code>\input{filename}</code>: <strong>直接嵌入</strong>。如同將 <code>filename.tex</code> 的內容複製貼上到當前位置。它更輕量、直接。</li>
+                    <li><code>\include{filename}</code>: <strong>智慧引入</strong>。它會在引入檔案前執行 <code>\clearpage</code> (另起一頁)，並且會為每個被 `include` 的檔案創建獨立的 <code>.aux</code> 輔助檔案。</li>
                 </ul>
-                <h4>特殊字元</h4>
-                <p>要輸入 LaTeX 的保留字元，需要使用反斜線轉義：<code>\# \$ \% \_ \{ \} \& \~ \^ \\</code></p>
-                
-                <h3 id="part3-4">3.4 空間與間距</h3>
-                <ul>
-                    <li><strong>段落</strong>: 用一個或多個<strong>空行</strong>來分隔段落。這是最標準的做法。</li>
-                    <li><strong>強制換行</strong>: <code>\\</code>。請謹慎使用，它不會開始一個新段落（即沒有段首縮排）。</li>
-                    <li><strong>水平間距</strong>: <code>\quad</code> (一個 M 的寬度), <code>\qquad</code> (兩個 M 的寬度), <code>\hspace{長度}</code> (例如 <code>\hspace{1cm}</code>)。</li>
-                    <li><strong>垂直間距</strong>: <code>\vspace{長度}</code>, <code>\smallskip</code>, <code>\medskip</code>, <code>\bigskip</code>。</li>
-                </ul>
-                <div class="warning">切勿使用多個 <code>\\</code> 來增加段落間距。若要調整段間距，應使用 <code>\setlength{\parskip}{長度}</code> 等指令在前導區進行全局設定。</div>
+                <div class="pro-tip">
+                    <strong>何時使用？</strong><br>
+                    - 對於書籍的<strong>章節</strong>，請使用 <code>\include</code>。它的最大好處是，您可以在前導區使用 <code>\includeonly{chap2,chap4}</code> 指令，這樣在編譯時 LaTeX 只會處理第 2 章和第 4 章的內容，但依然會保留所有章節的正確引用編號和頁碼。這在修改大型文件的某一章時，可以極大地加快編譯速度。<br>
+                    - 對於一些較小的、不需要獨立分頁的部分（例如一個共享的表格、一些自訂的命令定義），請使用 <code>\input</code>。
+                </div>
+<pre><code>% --- main.tex ---
+\documentclass{book}
+% \includeonly{chapters/introduction} % 只編譯引言，以加速
+\begin{document}
+\frontmatter
+...
+
+\mainmatter
+\include{chapters/introduction}
+\include{chapters/methodology}
+\include{chapters/results}
+
+\backmatter
+...
+\end{document}
+</code></pre>
             </section>
             
             <section id="part4">
@@ -479,7 +541,7 @@ The proof is trivial and left as an exercise for the reader.
             
             <section id="part8">
                 <h2>附錄：快速參考 (Quick Reference)</h2>
-                <table>
+                 <table>
                     <thead>
                         <tr>
                             <th>分類</th>
@@ -504,27 +566,28 @@ The proof is trivial and left as an exercise for the reader.
                 </table>
                 <div class="pro-tip">這份手冊是您旅程的開始。真正的精通來自於不斷的實踐、除錯和探索。祝您排版愉快！</div>
             </section>
-
         </main>
     </div>
     <script>
-        // Simple script to highlight active link in sidebar
-        const sections = document.querySelectorAll('section');
-        const navLi = document.querySelectorAll('.sidebar ul li a');
-        window.addEventListener('scroll', ()=> {
-            let current = '';
-            sections.forEach( section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 60) {
-                    current = section.getAttribute('id');
-                }
-            })
-            navLi.forEach( a => {
-                a.classList.remove('active');
-                if(a.getAttribute('href').includes(current)) {
-                    a.classList.add('active');
-                }
-            })
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const navLi = document.querySelectorAll('.sidebar ul li a');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLi.forEach(a => {
+                            a.classList.remove('active');
+                            if (a.getAttribute('href').includes(entry.target.id)) {
+                                a.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.3, rootMargin: '0px 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
         });
     </script>
 </body>
